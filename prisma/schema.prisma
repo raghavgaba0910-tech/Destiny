@@ -1,0 +1,161 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String   @id @default(cuid())
+  name         String
+  email        String   @unique
+  passwordHash String
+  role         Role     @default(PATIENT)
+  createdAt    DateTime @default(now())
+
+  professional  Professional?
+  appointments  Appointment[]  @relation("PatientAppointments")
+  assessments   Assessment[]
+  checkins      CheckIn[]
+  orders        Order[]
+  prescriptions Prescription[] @relation("PatientPrescriptions")
+}
+
+enum Role {
+  PATIENT
+  COUNSELLOR
+  THERAPIST
+  PSYCHIATRIST
+}
+
+model Professional {
+  id              String   @id @default(cuid())
+  userId          String   @unique
+  user            User     @relation(fields: [userId], references: [id])
+  type            ProfType
+  specialties     String[]
+  languages       String[]
+  bio             String
+  experience      Int
+  rating          Float
+  pricePerSession Int
+  tier            Tier
+
+  slots        Slot[]
+  appointments Appointment[] @relation("ProAppointments")
+}
+
+enum ProfType {
+  COUNSELLOR
+  THERAPIST
+  PSYCHIATRIST
+}
+
+enum Tier {
+  A
+  B
+  C
+}
+
+model Slot {
+  id             String   @id @default(cuid())
+  professionalId String
+  professional   Professional @relation(fields: [professionalId], references: [id])
+  startTime      DateTime
+  isBooked       Boolean  @default(false)
+
+  appointment Appointment?
+
+  @@unique([professionalId, startTime])
+}
+
+model Appointment {
+  id             String            @id @default(cuid())
+  patientId      String
+  patient        User              @relation("PatientAppointments", fields: [patientId], references: [id])
+  professionalId String
+  professional   Professional      @relation("ProAppointments", fields: [professionalId], references: [id])
+  slotId         String            @unique
+  slot           Slot              @relation(fields: [slotId], references: [id])
+  status         AppointmentStatus @default(UPCOMING)
+  createdAt      DateTime          @default(now())
+
+  prescriptions Prescription[]
+}
+
+enum AppointmentStatus {
+  UPCOMING
+  COMPLETED
+  CANCELLED
+}
+
+model Assessment {
+  id        String         @id @default(cuid())
+  userId    String
+  user      User           @relation(fields: [userId], references: [id])
+  type      AssessmentType
+  answers   Json
+  score     Int
+  severity  String
+  flagged   Boolean        @default(false)
+  createdAt DateTime       @default(now())
+}
+
+enum AssessmentType {
+  DEPRESSION
+  ANXIETY
+  SUBSTANCE
+  STRESS
+}
+
+model CheckIn {
+  id          String   @id @default(cuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id])
+  date        DateTime @default(now()) @db.Date
+  medication  Boolean  @default(false)
+  exercise    Boolean  @default(false)
+  meditation  Boolean  @default(false)
+  supplements Boolean  @default(false)
+
+  @@unique([userId, date])
+}
+
+model Prescription {
+  id            String      @id @default(cuid())
+  appointmentId String
+  appointment   Appointment @relation(fields: [appointmentId], references: [id])
+  patientId     String
+  patient       User        @relation("PatientPrescriptions", fields: [patientId], references: [id])
+  medicines     Json
+  createdAt     DateTime    @default(now())
+}
+
+model Medicine {
+  id          String @id @default(cuid())
+  name        String
+  type        String
+  description String
+  price       Int
+  category    String
+}
+
+model Order {
+  id        String      @id @default(cuid())
+  userId    String
+  user      User        @relation(fields: [userId], references: [id])
+  items     Json
+  total     Int
+  status    OrderStatus @default(PLACED)
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+}
+
+enum OrderStatus {
+  PLACED
+  PACKED
+  OUT_FOR_DELIVERY
+  DELIVERED
+}

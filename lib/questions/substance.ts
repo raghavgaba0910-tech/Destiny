@@ -1,0 +1,30 @@
+export const SUBSTANCE_QUESTIONS = [
+  // AUDIT-10 (scored per standard AUDIT scoring)
+  { id: 'aud1', text: 'How often do you have a drink containing alcohol?', options: ['Never', 'Monthly or less', '2-4 times a month', '2-3 times a week', '4 or more times a week'], scores: [0,1,2,3,4], screener: 'AUDIT' },
+  { id: 'aud2', text: 'How many units of alcohol do you drink on a typical day when you are drinking?', options: ['1-2', '3-4', '5-6', '7-9', '10 or more'], scores: [0,1,2,3,4], screener: 'AUDIT' },
+  { id: 'aud3', text: 'How often do you have 6 or more units if female, or 8 or more if male, on a single occasion?', options: ['Never', 'Less than monthly', 'Monthly', 'Weekly', 'Daily or almost daily'], scores: [0,1,2,3,4], screener: 'AUDIT' },
+  { id: 'aud4', text: 'How often during the last year have you found that you were not able to stop drinking once you had started?', options: ['Never', 'Less than monthly', 'Monthly', 'Weekly', 'Daily or almost daily'], scores: [0,1,2,3,4], screener: 'AUDIT' },
+  { id: 'aud5', text: 'How often during the last year have you failed to do what was normally expected from you because of your drinking?', options: ['Never', 'Less than monthly', 'Monthly', 'Weekly', 'Daily or almost daily'], scores: [0,1,2,3,4], screener: 'AUDIT' },
+  { id: 'aud6', text: 'How often during the last year have you needed a first drink in the morning to get yourself going after a heavy drinking session?', options: ['Never', 'Less than monthly', 'Monthly', 'Weekly', 'Daily or almost daily'], scores: [0,1,2,3,4], screener: 'AUDIT' },
+  { id: 'aud7', text: 'How often during the last year have you had a feeling of guilt or remorse after drinking?', options: ['Never', 'Less than monthly', 'Monthly', 'Weekly', 'Daily or almost daily'], scores: [0,1,2,3,4], screener: 'AUDIT' },
+  { id: 'aud8', text: 'How often during the last year have you been unable to remember what happened the night before because you had been drinking?', options: ['Never', 'Less than monthly', 'Monthly', 'Weekly', 'Daily or almost daily'], scores: [0,1,2,3,4], screener: 'AUDIT' },
+  { id: 'aud9', text: 'Have you or somebody else been injured as a result of your drinking?', options: ['No', 'Yes, but not in the last year', 'Yes, during the last year'], scores: [0,2,4], screener: 'AUDIT' },
+  { id: 'aud10', text: 'Has a relative or friend, doctor or other health worker been concerned about your drinking or suggested you cut down?', options: ['No', 'Yes, but not in the last year', 'Yes, during the last year'], scores: [0,2,4], screener: 'AUDIT' },
+  // DAST-10 (yes=1, no=0)
+  { id: 'das1', text: 'Have you used drugs other than those required for medical reasons?', options: ['No', 'Yes'], scores: [0,1], screener: 'DAST' },
+  { id: 'das2', text: 'Do you abuse more than one drug at a time?', options: ['No', 'Yes'], scores: [0,1], screener: 'DAST' },
+  { id: 'das3', text: 'Are you always able to stop using drugs when you want to?', options: ['Yes', 'No'], scores: [0,1], screener: 'DAST' },
+  { id: 'das4', text: 'Have you had "blackouts" or "flashbacks" as a result of drug use?', options: ['No', 'Yes'], scores: [0,1], screener: 'DAST' },
+  { id: 'das5', text: 'Do you ever feel bad or guilty about your drug use?', options: ['No', 'Yes'], scores: [0,1], screener: 'DAST' },
+  { id: 'das6', text: 'Does your partner (or parents) ever complain about your involvement with drugs?', options: ['No', 'Yes'], scores: [0,1], screener: 'DAST' },
+  { id: 'das7', text: 'Have you neglected your family because of your use of drugs?', options: ['No', 'Yes'], scores: [0,1], screener: 'DAST' },
+  { id: 'das8', text: 'Have you engaged in illegal activities in order to obtain drugs?', options: ['No', 'Yes'], scores: [0,1], screener: 'DAST' },
+  { id: 'das9', text: 'Have you ever experienced withdrawal symptoms (felt sick) when you stopped taking drugs?', options: ['No', 'Yes'], scores: [0,1], screener: 'DAST' },
+  { id: 'das10', text: 'Have you had medical problems as a result of your drug use?', options: ['No', 'Yes'], scores: [0,1], screener: 'DAST' },
+  // Original (0-2 each)
+  { id: 'sub1', text: 'Substance use has affected my ability to meet my responsibilities at work, college, or home.', options: ['Rarely or never', 'Sometimes', 'Often'], scores: [0,1,2] },
+  { id: 'sub2', text: 'I use substances to cope with stress, anxiety, or difficult emotions.', options: ['Rarely or never', 'Sometimes', 'Often'], scores: [0,1,2] },
+  { id: 'sub3', text: 'My relationships have suffered because of my substance use.', options: ['Rarely or never', 'Sometimes', 'Often'], scores: [0,1,2] },
+  { id: 'sub4', text: 'I am aware that my substance use has increased compared to a year ago.', options: ['Rarely or never', 'Sometimes', 'Often'], scores: [0,1,2] },
+  { id: 'sub5', text: 'I have thought about reducing my substance use but found it difficult to follow through.', options: ['Rarely or never', 'Sometimes', 'Often'], scores: [0,1,2] },
+]

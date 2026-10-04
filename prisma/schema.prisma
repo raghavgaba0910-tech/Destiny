@@ -32,6 +32,7 @@ enum Role {
 
 model Professional {
   id              String   @id @default(cuid())
+  professionalCode String  @unique
   userId          String   @unique
   user            User     @relation(fields: [userId], references: [id])
   type            ProfType
@@ -75,14 +76,26 @@ model Appointment {
   id             String            @id @default(cuid())
   patientId      String
   patient        User              @relation("PatientAppointments", fields: [patientId], references: [id])
+  patientName    String
+  patientAge     Int
+  patientGender  PatientGender
   professionalId String
   professional   Professional      @relation("ProAppointments", fields: [professionalId], references: [id])
   slotId         String            @unique
   slot           Slot              @relation(fields: [slotId], references: [id])
   status         AppointmentStatus @default(UPCOMING)
+  sharedAssessmentId String?
+  sharedAssessment Assessment? @relation("SharedAssessment", fields: [sharedAssessmentId], references: [id], onDelete: SetNull)
   createdAt      DateTime          @default(now())
 
   prescriptions Prescription[]
+
+}
+
+enum PatientGender {
+  MALE
+  FEMALE
+  OTHER
 }
 
 enum AppointmentStatus {
@@ -101,6 +114,7 @@ model Assessment {
   severity  String
   flagged   Boolean        @default(false)
   createdAt DateTime       @default(now())
+  sharedAppointments Appointment[] @relation("SharedAssessment")
 }
 
 enum AssessmentType {

@@ -3,6 +3,7 @@ import path from 'path'
 
 type MailAppointment = {
   id: string
+  patientName?: string
   patient?: { name?: string | null } | null
   professional?: { user?: { name?: string | null } | null; pricePerSession?: number } | null
   slot?: { startTime?: Date } | null
@@ -23,7 +24,7 @@ export async function generateMailPreview(appointment: MailAppointment) {
   await fs.mkdir(previewDir, { recursive: true })
 
   const profName = escapeHtml(appointment.professional?.user?.name || 'Your Professional')
-  const patientName = escapeHtml(appointment.patient?.name || 'there')
+  const patientName = escapeHtml(appointment.patientName || appointment.patient?.name || 'there')
   const slotTime = appointment.slot?.startTime ? new Date(appointment.slot.startTime) : new Date()
   const price = appointment.professional?.pricePerSession || 0
   const dateLabel = new Intl.DateTimeFormat('en-IN', {
@@ -50,14 +51,14 @@ export async function generateMailPreview(appointment: MailAppointment) {
   <h2>Hi ${patientName},</h2>
   <p>Your session has been confirmed. Here are the details:</p>
   <div style="background: white; border-radius: 12px; padding: 24px; margin: 24px 0; border: 1px solid #E5E7EB;">
-    <p><strong>Professional:</strong> ${profName} <em>(Demo profile)</em></p>
+    <p><strong>Professional:</strong> ${profName}</p>
     <p><strong>Date:</strong> ${dateLabel}</p>
     <p><strong>Time:</strong> ${timeLabel} IST</p>
-    <p><strong>Session fee:</strong> ₹${price} <em style="color: #6B7280;">(demo — no payment collected)</em></p>
+    <p><strong>Session fee:</strong> ₹${price}</p>
   </div>
   <p>Join from your <a href="http://localhost:3000/dashboard" style="color: #4F46E5;">Destiny dashboard</a>.</p>
   <hr style="border: none; border-top: 1px solid #E5E7EB; margin: 32px 0;">
-  <p style="color: #6B7280; font-size: 13px;">This is a demo confirmation. No real payment was collected.<br>Destiny does not replace emergency care. In crisis? Call Tele-MANAS: <strong>14416</strong> | Emergency: <strong>112</strong></p>
+  <p style="color: #6B7280; font-size: 13px;">No payment was collected.<br>Destiny does not replace emergency care. In crisis? Call Tele-MANAS: <strong>14416</strong> | Emergency: <strong>112</strong></p>
 </body>
 </html>`
 

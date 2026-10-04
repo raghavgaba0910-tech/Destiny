@@ -3,10 +3,10 @@ import { auth } from '@/auth'
 import { ArrowRight, ArrowUpRight, AudioLines, Brain, Check, ChevronDown, CircleHelp, Clock3, Compass, Heart, HeartHandshake, LockKeyhole, MessageCircleHeart, ShieldCheck, Sparkles, Stethoscope } from 'lucide-react'
 
 const faqs = [
-  ['Is Destiny therapy?', 'No. Destiny is a demo of a guided path to care. It cannot diagnose, treat, or replace a qualified clinician.'],
-  ['Are the check-ins free?', 'Yes. You can try the sample check-in flows and view a demo care report without paying.'],
-  ['Are the professionals real?', 'No. Provider profiles and appointment slots in this prototype are sample records created for demonstration.'],
-  ['What happens to my information?', 'This local MVP saves demo account and check-in information in its configured database. Please do not enter real health details.'],
+  ['Is Destiny therapy?', 'No. Destiny helps you explore possible next steps. It cannot diagnose, treat, or replace a qualified clinician.'],
+  ['Are the check-ins free?', 'Yes. The check-in flows and care reports are available without charge.'],
+  ['Are the professionals real?', 'Provider profiles and appointment availability are illustrative and have not been independently verified.'],
+  ['What happens to my information?', 'Information is stored in this app’s configured database. Please do not enter real or sensitive health details.'],
   ['Can I get help in an emergency?', 'If you are in immediate danger in India, call emergency services on 112. Tele-MANAS support is available at 14416.'],
 ]
 
@@ -27,7 +27,7 @@ export default async function HomePage() {
         <nav className="mx-auto flex h-[4.5rem] max-w-7xl items-center justify-between px-5 md:px-8">
           <Link href="/" className="flex items-center gap-2.5" aria-label="Destiny home">
             <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#171a32] text-white shadow-sm"><Sparkles className="h-[18px] w-[18px] text-teal" /></span>
-            <span className="text-lg font-semibold tracking-tight">destiny<span className="text-violet">.</span></span>
+            <span className="text-lg font-semibold tracking-tight">Destiny<span className="text-violet">.</span></span>
           </Link>
           <div className="hidden items-center gap-8 text-[13px] font-medium text-slate-600 md:flex">
             <a href="#how-it-works" className="transition hover:text-violet">How it works</a>
@@ -130,7 +130,7 @@ export default async function HomePage() {
 
       <section id="faq" className="border-t border-slate-200/70 bg-white">
         <div className="mx-auto grid max-w-7xl gap-8 px-5 py-20 md:grid-cols-[.7fr_1.3fr] md:px-8 md:py-24">
-          <div><p className="text-[10px] font-bold uppercase tracking-[.17em] text-violet">A few useful things</p><h2 className="mt-3 text-3xl font-semibold tracking-tight text-ink">Questions, answered.</h2><p className="mt-3 text-sm leading-6 text-slate-500">We want you to know what this demo is — and what it isn’t.</p><span className="mt-6 inline-flex items-center gap-2 text-xs text-slate-400"><CircleHelp className="h-4 w-4" /> We’re here to make things clearer.</span></div>
+          <div><p className="text-[10px] font-bold uppercase tracking-[.17em] text-violet">A few useful things</p><h2 className="mt-3 text-3xl font-semibold tracking-tight text-ink">Questions, answered.</h2><p className="mt-3 text-sm leading-6 text-slate-500">Clear answers about the care and tools available here.</p><span className="mt-6 inline-flex items-center gap-2 text-xs text-slate-400"><CircleHelp className="h-4 w-4" /> We’re here to make things clearer.</span></div>
           <div className="divide-y divide-slate-100">{faqs.map(([question, answer]) => <details key={question} className="group py-4"><summary className="flex cursor-pointer list-none items-center justify-between gap-4 text-sm font-semibold text-ink [&::-webkit-details-marker]:hidden">{question}<ChevronDown className="h-4 w-4 shrink-0 text-slate-400 transition group-open:rotate-180" /></summary><p className="max-w-2xl pr-8 pt-3 text-xs leading-6 text-slate-500">{answer}</p></details>)}</div>
         </div>
       </section>
@@ -141,7 +141,7 @@ export default async function HomePage() {
             <div><p className="text-xs font-semibold text-rose-950">Need immediate support in India?</p><p className="mt-1 text-xs leading-5 text-rose-950/70">Call emergency services <a href="tel:112" className="font-bold underline">112</a> or contact Tele-MANAS at <a href="tel:14416" className="font-bold underline">14416</a>.</p><p className="mt-1 text-[10px] text-rose-950/55">Destiny does not replace emergency care.</p></div>
             <Link href={startHref} className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl bg-[#171a32] px-4 text-xs font-semibold text-white transition hover:bg-indigo">Take a small first step <ArrowRight className="h-3.5 w-3.5" /></Link>
           </div>
-          <div className="flex flex-col gap-3 py-6 sm:flex-row sm:items-center sm:justify-between"><Link href="/" className="flex items-center gap-2 text-sm font-semibold"><span className="flex h-7 w-7 items-center justify-center rounded-lg bg-[#171a32] text-white"><Sparkles className="h-3.5 w-3.5 text-teal" /></span> destiny.</Link><p className="text-[10px] leading-5 text-slate-500">MVP demonstration only. Sample provider profiles are not verified. Please do not enter real health information.</p><div className="flex gap-4 text-[10px] font-medium text-slate-500"><Link href="/login" className="hover:text-indigo">Log in</Link><Link href="/register" className="hover:text-indigo">Create account</Link></div></div>
+          <div className="flex flex-col gap-3 py-6 sm:flex-row sm:items-center sm:justify-between"><Link href="/" className="flex items-center gap-2 text-sm font-semibold"><span className="flex h-7 w-7 items-center justify-center rounded-lg bg-[#171a32] text-white"><Sparkles className="h-3.5 w-3.5 text-teal" /></span> Destiny.</Link><p className="text-[10px] leading-5 text-slate-500">Provider profiles are illustrative and not verified. Destiny is not a clinical service. Please do not enter real health information.</p><div className="flex gap-4 text-[10px] font-medium text-slate-500"><Link href="/login" className="hover:text-indigo">Log in</Link><Link href="/register" className="hover:text-indigo">Create account</Link></div></div>
         </div>
       </footer>
     </main>

@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { BadgeCheck, BriefcaseBusiness, CalendarDays, Clock3, Globe2, HeartHandshake, ShieldCheck, Star, Video } from 'lucide-react'
 import { db } from '@/lib/db'
+import { auth } from '@/auth'
 import { BookingSection } from '@/components/destiny/BookingSection'
 import { GradientAvatar } from '@/components/destiny/GradientAvatar'
 
@@ -9,8 +10,12 @@ const priceFormat = new Intl.NumberFormat('en-IN')
 
 export default async function ProfessionalProfilePage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
+  const session = await auth()
   const professional = await db.professional.findUnique({ where: { id }, include: { user: { select: { name: true } } } })
   if (!professional) notFound()
+  const latestAssessment = session?.user?.role === 'PATIENT'
+    ? await db.assessment.findFirst({ where: { userId: session.user.id }, select: { id: true } })
+    : null
 
   const typeLabel = professional.type === 'PSYCHIATRIST' ? 'Psychiatrist' : professional.type === 'THERAPIST' ? 'Therapist' : 'Counsellor'
 
@@ -30,7 +35,7 @@ export default async function ProfessionalProfilePage({ params }: { params: Prom
             <div className="max-w-3xl">
               <div className="flex flex-wrap items-center gap-2">
                 <span className="rounded-full border border-white/15 bg-white/[.07] px-3 py-1 text-[10px] font-semibold uppercase tracking-[.14em] text-teal-100">{typeLabel}</span>
-                <span className="rounded-full border border-white/15 bg-white/[.07] px-3 py-1 text-[10px] font-medium text-white/65">Demo profile</span>
+                <span className="rounded-full border border-white/15 bg-white/[.07] px-3 py-1 text-[10px] font-medium text-white/65">{professional.professionalCode}</span>
               </div>
               <h1 className="mt-3 text-3xl font-semibold tracking-tight md:text-4xl">{professional.user.name}</h1>
               <p className="mt-3 max-w-2xl text-sm leading-6 text-white/65 md:text-base">{professional.specialties.slice(0, 3).join(' · ')}</p>
@@ -68,13 +73,15 @@ export default async function ProfessionalProfilePage({ params }: { params: Prom
           </section>
 
           <section className="rounded-[1.65rem] border border-indigo/10 bg-indigo/[.035] p-5 sm:p-6">
-            <div className="flex gap-3"><ShieldCheck className="mt-0.5 h-5 w-5 shrink-0 text-indigo" /><div><h2 className="text-sm font-semibold text-ink">Please note</h2><p className="mt-1 text-xs leading-5 text-slate-600">This is a fictional demonstration profile. The sample rating, biography, and availability are not verified. Destiny does not provide emergency care or replace a qualified professional.</p></div></div>
+            <div className="flex gap-3"><ShieldCheck className="mt-0.5 h-5 w-5 shrink-0 text-indigo" /><div><h2 className="text-sm font-semibold text-ink">Please note</h2><p className="mt-1 text-xs leading-5 text-slate-600">Destiny does not provide emergency care or replace a qualified professional.</p></div></div>
           </section>
         </div>
 
         <aside className="lg:sticky lg:top-6">
-          <BookingSection professionalId={professional.id} professionalName={professional.user.name} pricePerSession={professional.pricePerSession} />
-          <p className="mt-3 text-center text-[10px] leading-4 text-slate-400">Session fee shown for the demo only: ₹{priceFormat.format(professional.pricePerSession)}. No payment is collected.</p>
+          {session?.user?.role === 'PATIENT'
+            ? <BookingSection professionalId={professional.id} professionalName={professional.user.name} patientName={session.user.name} hasAssessment={Boolean(latestAssessment)} pricePerSession={professional.pricePerSession} />
+            : <div className="rounded-2xl border border-slate-200 bg-white p-5 text-sm leading-6 text-slate-600">Appointments can be booked from a patient account.</div>}
+          <p className="mt-3 text-center text-[10px] leading-4 text-slate-400">Session fee: ₹{priceFormat.format(professional.pricePerSession)}. Payment is not collected here.</p>
         </aside>
       </div>
     </main>

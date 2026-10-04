@@ -8,6 +8,7 @@ import { GradientAvatar } from '@/components/destiny/GradientAvatar'
 
 type Professional = {
   id: string
+  professionalCode: string
   type: string
   specialties: string[]
   languages: string[]
@@ -36,6 +37,7 @@ export function ProfessionalsPage({ professionals, heading }: { professionals: P
     .filter((person) => {
       const normalizedQuery = query.trim().toLocaleLowerCase()
       return !normalizedQuery
+        || person.professionalCode.toLocaleLowerCase().includes(normalizedQuery)
         || person.user.name.toLocaleLowerCase().includes(normalizedQuery)
         || person.specialties.some((item) => item.toLocaleLowerCase().includes(normalizedQuery))
         || person.languages.some((item) => item.toLocaleLowerCase().includes(normalizedQuery))
@@ -71,17 +73,17 @@ export function ProfessionalsPage({ professionals, heading }: { professionals: P
             </div>
             <div className="flex gap-3 lg:pb-1">
               <div className="rounded-2xl border border-white/10 bg-white/[0.06] px-5 py-4">
-                <p className="text-2xl font-semibold">{professionals.length}</p><p className="mt-1 text-xs text-white/55">sample profiles</p>
+                <p className="text-2xl font-semibold">{professionals.length}</p><p className="mt-1 text-xs text-white/55">professionals</p>
               </div>
               <div className="rounded-2xl border border-white/10 bg-white/[0.06] px-5 py-4">
-                <p className="text-2xl font-semibold">Online</p><p className="mt-1 text-xs text-white/55">demo sessions</p>
+                <p className="text-2xl font-semibold">Online</p><p className="mt-1 text-xs text-white/55">appointment options</p>
               </div>
             </div>
           </div>
           <div className="mt-9 flex flex-wrap gap-x-6 gap-y-3 text-xs text-white/70">
             <span className="inline-flex items-center gap-2"><Video className="h-4 w-4 text-teal" /> Online sessions</span>
             <span className="inline-flex items-center gap-2"><CalendarDays className="h-4 w-4 text-teal" /> Flexible weekdays</span>
-            <span className="inline-flex items-center gap-2"><BadgeCheck className="h-4 w-4 text-teal" /> Demo profiles, clearly labelled</span>
+            <span className="inline-flex items-center gap-2"><BadgeCheck className="h-4 w-4 text-teal" /> Professional IDs for every provider</span>
           </div>
         </div>
       </section>
@@ -134,7 +136,7 @@ export function ProfessionalsPage({ professionals, heading }: { professionals: P
                         <div className="min-w-0">
                           <div className="flex flex-wrap items-center gap-2">
                             <span className="rounded-full bg-violet/8 px-2.5 py-1 text-[10px] font-bold uppercase tracking-[.12em] text-violet">{person.type.toLowerCase()}</span>
-                            <span className="rounded-full border border-slate-200 px-2.5 py-1 text-[10px] font-medium text-slate-500">Demo profile</span>
+                            <span className="rounded-full border border-slate-200 px-2.5 py-1 text-[10px] font-medium text-slate-500">{person.professionalCode}</span>
                           </div>
                           <h2 className="mt-2 truncate text-lg font-semibold tracking-tight text-ink">{person.user.name}</h2>
                           <div className="mt-1 flex items-center gap-1.5 text-xs text-slate-500"><BriefcaseBusiness className="h-3.5 w-3.5" />{person.experience} years experience</div>
@@ -161,7 +163,7 @@ export function ProfessionalsPage({ professionals, heading }: { professionals: P
             <div className="rounded-[1.75rem] border border-dashed border-slate-300 bg-white px-6 py-16 text-center">
               <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-violet/10 text-violet"><Search className="h-6 w-6" /></div>
               <h2 className="mt-5 text-lg font-semibold text-ink">No one matches those filters just yet</h2>
-              <p className="mx-auto mt-2 max-w-md text-sm leading-6 text-slate-500">Try a broader search or clear the filters to see everyone available in this demo directory.</p>
+              <p className="mx-auto mt-2 max-w-md text-sm leading-6 text-slate-500">Try a broader search or clear the filters to see all available professionals.</p>
               <button type="button" onClick={clearFilters} className="mt-5 inline-flex min-h-11 items-center gap-2 rounded-xl bg-indigo px-4 text-sm font-semibold text-white transition hover:bg-indigo/90">Show everyone <ArrowRight className="h-4 w-4" /></button>
             </div>
           )}

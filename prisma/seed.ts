@@ -1,5 +1,6 @@
 import { PrismaClient, ProfType, Tier, AppointmentStatus, OrderStatus } from '@prisma/client'
 import bcrypt from 'bcryptjs'
+import { formatProfessionalCode } from '@/lib/professional-code'
 
 const prisma = new PrismaClient()
 
@@ -19,6 +20,12 @@ function createRNG(seed: string) {
 }
 
 const rng = createRNG('destiny-v1')
+let professionalNumber = 0
+
+function nextProfessionalCode(type: ProfType) {
+  professionalNumber += 1
+  return formatProfessionalCode(professionalNumber, type)
+}
 
 function randInt(min: number, max: number) {
   return Math.floor(rng() * (max - min + 1)) + min
@@ -56,8 +63,7 @@ const COUNSELLOR_NAMES = [
 ]
 
 function generateBio(name: string, specialties: string[], years: number): string {
-  const pronoun = name.includes('Dr.') ? 'They' : 'They'
-  return `${name} has ${years} year${years !== 1 ? 's' : ''} of experience supporting young adults through ${specialties.slice(0, 2).join(' and ')}. ${pronoun} believe in creating a safe, non-judgmental space where you can explore your thoughts at your own pace. Demo profile.`
+  return `${name} has ${years} year${years !== 1 ? 's' : ''} of experience supporting young adults through ${specialties.slice(0, 2).join(' and ')}. They believe in creating a safe, non-judgmental space where you can explore your thoughts at your own pace.`
 }
 
 interface ProfSpec {
@@ -137,7 +143,7 @@ async function main() {
       'English',
       ...pick(LANGUAGES.filter((language) => language !== 'Hindi' && language !== 'English'), randInt(1, 2)),
     ]))
-    const email = `${name.toLowerCase().replace(/[^a-z0-9]/g, '.')}${index}@destiny.demo`
+    const email = `${name.toLowerCase().replace(/[^a-z0-9]/g, '.')}${index}@destiny.local`
     const role = spec.type === 'COUNSELLOR' ? 'COUNSELLOR' : spec.type === 'PSYCHIATRIST' ? 'PSYCHIATRIST' : 'THERAPIST'
 
     const user = await prisma.user.create({
@@ -148,6 +154,7 @@ async function main() {
         role: role as any,
         professional: {
           create: {
+            professionalCode: nextProfessionalCode(spec.type),
             type: spec.type,
             specialties,
             languages,
@@ -198,160 +205,98 @@ async function main() {
     allProfessionalUsers.push(result)
   }
 
-  // Demo psychiatrist account
-  const firstPsychiatrist = allProfessionalUsers.find(p => p.professional.type === 'PSYCHIATRIST')
-  const firstCounsellor = allProfessionalUsers.find(p => p.professional.type === 'COUNSELLOR')
+  async function seedRoleProfessional(name: string, email: string, role: ProfType) {
+    const professional = await prisma.user.create({
+      data: {
+        name,
+        email,
+        passwordHash: await bcrypt.hash('Demo@1234', 12),
+        role,
+        professional: {
+          create: {
+            professionalCode: nextProfessionalCode(role),
+            type: role,
+            specialties: role === 'PSYCHIATRIST' ? ['Anxiety', 'Depression'] : role === 'COUNSELLOR' ? ['Anxiety', 'Stress', 'Life transitions'] : ['Anxiety', 'Depression', 'Relationships'],
+            languages: ['Hindi', 'English'],
+            bio: `${name} offers thoughtful, confidential support for young adults.`,
+            experience: role === 'PSYCHIATRIST' ? 6 : 4,
+            rating: role === 'PSYCHIATRIST' ? 9.2 : 8.5,
+            pricePerSession: role === 'PSYCHIATRIST' ? 3000 : role === 'COUNSELLOR' ? 1800 : 2200,
+            tier: 'B',
+          },
+        },
+      },
+      include: { professional: true },
+    })
 
-  const psychUser = await prisma.user.upsert({
-    where: { email: 'psychiatrist@demo.destiny' },
-    update: {},
-    create: {
-      name: 'Dr. Demo Psychiatrist',
-      email: 'psychiatrist@demo.destiny',
-      passwordHash: await bcrypt.hash('Demo@1234', 12),
-      role: 'PSYCHIATRIST',
-      professional: {
-        create: {
-          type: 'PSYCHIATRIST',
-          specialties: ['Anxiety', 'Depression'],
-          languages: ['Hindi', 'English'],
-          bio: 'Demo psychiatrist account for testing. Demo profile.',
-          experience: 6,
-          rating: 9.2,
-          pricePerSession: 3000,
-          tier: 'C',
+    const slotData: { professionalId: string; startTime: Date }[] = []
+    const day = new Date()
+    day.setHours(0, 0, 0, 0)
+    let weekdaysAdded = 0
+    while (weekdaysAdded < 21) {
+      if (day.getDay() !== 0 && day.getDay() !== 6) {
+        for (const { h, m } of SLOT_HOURS) {
+          const startTime = new Date(day)
+          startTime.setHours(h, m, 0, 0)
+          slotData.push({ professionalId: professional.professional!.id, startTime })
         }
+        weekdaysAdded += 1
       }
-    },
-    include: { professional: true }
-  })
-
-  // Seed slots for demo psychiatrist
-  const today2 = new Date()
-  today2.setHours(0, 0, 0, 0)
-  const psychSlotData = []
-  let daysAdded2 = 0
-  let d2 = new Date(today2)
-  while (daysAdded2 < 21) {
-    const dayOfWeek = d2.getDay()
-    if (dayOfWeek !== 0 && dayOfWeek !== 6) {
-      for (const { h, m } of SLOT_HOURS) {
-        const slotTime = new Date(d2)
-        slotTime.setHours(h, m, 0, 0)
-        psychSlotData.push({ professionalId: psychUser.professional!.id, startTime: slotTime })
-      }
-      daysAdded2++
+      day.setDate(day.getDate() + 1)
     }
-    d2.setDate(d2.getDate() + 1)
+    await prisma.slot.createMany({ data: slotData })
+    return professional
   }
-  await prisma.slot.createMany({ data: psychSlotData })
 
-  const counsellorUser = await prisma.user.upsert({
-    where: { email: 'counsellor@demo.destiny' },
-    update: {},
-    create: {
-      name: 'Demo Counsellor',
-      email: 'counsellor@demo.destiny',
-      passwordHash: await bcrypt.hash('Demo@1234', 12),
-      role: 'COUNSELLOR',
-      professional: {
-        create: {
-          type: 'COUNSELLOR',
-          specialties: ['Anxiety', 'Stress', 'Life transitions'],
-          languages: ['Hindi', 'English'],
-          bio: 'Demo counsellor account for testing. Demo profile.',
-          experience: 3,
-          rating: 8.1,
-          pricePerSession: 1800,
-          tier: 'B',
-        }
-      }
-    },
-    include: { professional: true }
-  })
+  const psychiatrist = await seedRoleProfessional('Dr. Mira Rao', 'psychiatrist@demo.destiny', 'PSYCHIATRIST')
+  const counsellor = await seedRoleProfessional('Aarav Sen', 'counsellor@demo.destiny', 'COUNSELLOR')
+  const therapist = await seedRoleProfessional('Dr. Neha Kapoor', 'therapist@demo.destiny', 'THERAPIST')
 
-  // Seed slots for demo counsellor
-  const today3 = new Date()
-  today3.setHours(0, 0, 0, 0)
-  const counsellorSlotData = []
-  let daysAdded3 = 0
-  let d3 = new Date(today3)
-  while (daysAdded3 < 21) {
-    const dayOfWeek = d3.getDay()
-    if (dayOfWeek !== 0 && dayOfWeek !== 6) {
-      for (const { h, m } of SLOT_HOURS) {
-        const slotTime = new Date(d3)
-        slotTime.setHours(h, m, 0, 0)
-        counsellorSlotData.push({ professionalId: counsellorUser.professional!.id, startTime: slotTime })
-      }
-      daysAdded3++
-    }
-    d3.setDate(d3.getDate() + 1)
-  }
-  await prisma.slot.createMany({ data: counsellorSlotData })
-
-  // Demo patient 1 (has completed appointment + prescription)
-  const patient1 = await prisma.user.upsert({
-    where: { email: 'patient1@demo.destiny' },
-    update: {},
-    create: {
-      name: 'Aisha Demo',
+  const patient1 = await prisma.user.create({
+    data: {
+      name: 'Aisha Sharma',
       email: 'patient1@demo.destiny',
       passwordHash: await bcrypt.hash('Demo@1234', 12),
       role: 'PATIENT',
-    }
+    },
   })
-
-  // Find a slot for patient1's completed appointment
-  const pastSlot = await prisma.slot.findFirst({
-    where: {
-      professionalId: psychUser.professional!.id,
-      isBooked: false,
-    }
-  })
-
-  if (pastSlot) {
-    await prisma.slot.update({ where: { id: pastSlot.id }, data: { isBooked: true } })
-    const appointment = await prisma.appointment.create({
-      data: {
-        patientId: patient1.id,
-        professionalId: psychUser.professional!.id,
-        slotId: pastSlot.id,
-        status: 'COMPLETED',
-      }
-    })
-
-    // Prescription for patient1
-    await prisma.prescription.create({
-      data: {
-        appointmentId: appointment.id,
-        patientId: patient1.id,
-        medicines: [
-          { medicineId: medicines[6].id, name: 'Sertraline 50mg', dose: '50mg once daily', duration: '30 days', notes: 'Take in the morning with food' },
-          { medicineId: medicines[0].id, name: 'Ashwagandha 300mg', dose: '300mg twice daily', duration: '30 days', notes: 'Take with meals' },
-        ]
-      }
-    })
-  }
-
-  // Demo patient 2 (new)
-  await prisma.user.upsert({
-    where: { email: 'patient2@demo.destiny' },
-    update: {},
-    create: {
-      name: 'Rohan Demo',
+  await prisma.user.create({
+    data: {
+      name: 'Rohan Mehta',
       email: 'patient2@demo.destiny',
       passwordHash: await bcrypt.hash('Demo@1234', 12),
       role: 'PATIENT',
-    }
+    },
   })
 
-  console.log('✅ Database seeded successfully!')
-  console.log('\n📋 Demo accounts:')
-  console.log('  patient1@demo.destiny / Demo@1234 (PATIENT with completed session + prescription)')
-  console.log('  patient2@demo.destiny / Demo@1234 (PATIENT, new)')
-  console.log('  psychiatrist@demo.destiny / Demo@1234 (PSYCHIATRIST)')
-  console.log('  counsellor@demo.destiny / Demo@1234 (COUNSELLOR)')
+  for (const provider of [psychiatrist, counsellor, therapist]) {
+    const slot = await prisma.slot.findFirst({
+      where: { professionalId: provider.professional!.id, isBooked: false, startTime: { gt: new Date() } },
+      orderBy: { startTime: 'asc' },
+    })
+    if (!slot) throw new Error(`No upcoming sample session slot is available for ${provider.email}.`)
+    await prisma.$transaction([
+      prisma.slot.update({ where: { id: slot.id }, data: { isBooked: true } }),
+      prisma.appointment.create({
+        data: {
+          patientId: patient1.id,
+          patientName: patient1.name,
+          patientAge: 28,
+          patientGender: 'FEMALE',
+          professionalId: provider.professional!.id,
+          slotId: slot.id,
+        },
+      }),
+    ])
+  }
+
+  console.log('Database seeded successfully.')
+  console.log('\nSign-in accounts (all passwords: Demo@1234):')
+  console.log('  patient1@demo.destiny (PATIENT; sample upcoming sessions)')
+  console.log('  patient2@demo.destiny (PATIENT)')
+  console.log('  psychiatrist@demo.destiny (PSYCHIATRIST)')
+  console.log('  counsellor@demo.destiny (COUNSELLOR)')
+  console.log('  therapist@demo.destiny (THERAPIST)')
 }
 
 main()

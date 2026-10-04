@@ -1,85 +1,100 @@
-# Destiny MVP
+# Destiny
 
-Destiny is an India-first teletherapy journey prototype for young adults. It includes reflection assessments, a care report, sample professional profiles and bookings, a local demo session room, daily check-ins, and a prescription-gated demo pharmacy.
+Destiny is an India-focused mental wellbeing MVP with self-reflection assessments, provider listings, appointment booking, role-specific workspaces, local session-room previews, daily check-ins, and a prescription-gated pharmacy catalogue.
 
-> **Demo only:** This application is not a clinical service(ONLY A MVP). The assessment results are not diagnoses, provider profiles are sample data, the video room is not a real telehealth connection, orders do not collect payment or deliver medicine, and the app is not suitable for storing real health information.
+> **Important:** Destiny is not a clinical, pharmacy, or emergency service. Assessments are not diagnoses, listed providers are illustrative and not verified, the session room does not connect remote participants, and pharmacy orders are not fulfilled. Do not enter real or sensitive health information.
 
 ## Requirements
 
-- Node.js 20 LTS (Node 18.18 or newer is required by Next.js 15)
-- pnpm 9+ (`corepack enable` to activate the pnpm version bundled with Node)
-- PostgreSQL 14+ running locally or remotely
+- Node.js 20 LTS
+- pnpm 9+ (activate with `corepack enable`)
+- PostgreSQL 14+
 
 ## Local setup (Windows / PowerShell)
 
-1. Open this folder in VS Code and open a PowerShell terminal.
-2. If PostgreSQL is not installed, install PostgreSQL 14+ using the official Windows installer, leave the database service running, and note the password you set for the `postgres` user. Create a database named `destiny` from PowerShell:
+1. Open the project folder in VS Code and start a PowerShell terminal.
+2. Create a PostgreSQL database named `destiny` if you do not already have one:
 
    ```powershell
    psql -U postgres -h localhost -p 5432 -c "CREATE DATABASE destiny;"
    ```
 
-   If you use another PostgreSQL username, host, or port, substitute those values in the command and in `DATABASE_URL`.
-
-3. Copy the environment template:
+3. Create your local environment file:
 
    ```powershell
    Copy-Item .env.example .env
    ```
 
-4. Edit `.env`. Set `DATABASE_URL` to your local connection, for example:
-
-   ```dotenv
-   DATABASE_URL="postgresql://postgres:YOUR_PASSWORD@localhost:5432/destiny?schema=public"
-   ```
-
-   Generate a private Auth.js secret and paste it into `AUTH_SECRET`:
+4. Set `DATABASE_URL` in `.env` to your PostgreSQL connection. Generate an Auth.js secret with:
 
    ```powershell
    node -e "console.log(require('crypto').randomBytes(32).toString('base64'))"
    ```
 
-   Keep `.env` local and never commit it.
+   Keep `.env` private and do not commit it.
 
-5. Install dependencies and generate the Prisma client:
+5. Install packages and generate the Prisma client:
 
    ```powershell
    pnpm install
    ```
 
-6. Create the database schema and tables:
+6. Apply database migrations and populate the sample catalogue and accounts:
 
    ```powershell
-   pnpm exec prisma migrate dev --name init
-   ```
-
-7. Load deterministic sample professionals, slots, medicines, and demo accounts. **The seed script deletes existing Destiny app data first**, so only run this against a fresh disposable development database:
-
-   ```powershell
+   pnpm exec prisma migrate dev
    pnpm db:seed
    ```
 
-   If the demo data is already installed and you only need to ensure every existing professional lists Hindi and English, run the non-destructive language update instead:
+   `pnpm db:seed` clears existing Destiny tables before seeding. Use it only when you intend to rebuild the local application data.
 
-   ```powershell
-   pnpm db:languages
-   ```
-
-   To clear saved patient activity for all accounts while keeping accounts, professional profiles, medicines, and available slots, run:
-
-   ```powershell
-   pnpm db:clear-activity
-   ```
-
-8. Start Destiny:
+7. Start the development server:
 
    ```powershell
    pnpm dev
    ```
 
-   Open [http://localhost:3000](http://localhost:3000).
+   Open [http://localhost:3000](http://localhost:3000). Keep the terminal open while using the app; stop the server with **Ctrl+C**.
 
-## Verify the setup
+## Sign-in accounts
+
+The existing four accounts use the password `Demo@1234`. The therapist login created by the final reset uses the same password. Select the matching role in **Log in as**.
+
+| Role | Email |
+| --- | --- |
+| Patient with three upcoming sample appointments | `patient1@demo.destiny` |
+| Patient | `patient2@demo.destiny` |
+| Psychiatrist | `psychiatrist@demo.destiny` |
+| Counsellor | `counsellor@demo.destiny` |
+| Therapist | `therapist@demo.destiny` |
+
+Each professional sees their unique `DT` ID in their workspace and provider profile. The final letter identifies the role: `T` therapist, `C` counsellor, `P` psychiatrist.
+
+## Booking and report sharing
+
+Patients choose an available appointment time, then enter their name, age, and gender. If they have a completed assessment, its report is included for the professional by default; patients can uncheck the sharing option before confirming. The selected professional can view only the report attached to their appointment. If there is no completed assessment, only the appointment details are shared.
+
+The application transactionally reserves each slot to prevent two patients from booking it at once.
+
+## Conducting a session
+
+1. Sign in with the appropriate professional role and open **Upcoming sessions** in the workspace.
+2. Review the appointment details and any assessment report the patient chose to share.
+3. Arrange the real-time conversation with the patient separately using a secure video or in-person service. Destiny’s session room does **not** provide a remote connection; its camera and microphone preview is local to the current browser.
+4. The session room opens from 10 minutes before the appointment until 15 minutes after its start. Either participant may open the room, and the appointment can be marked complete within that window.
+5. Psychiatrists can issue a prescription after a completed appointment. Other professional roles do not have prescription access.
+
+## Reset local account data
+
+To remove all non-listed accounts and clear assessments, check-ins, appointments, prescriptions, and orders, while restoring the five sign-in accounts and one upcoming sample session per professional role, run:
+
+```powershell
+pnpm db:reset-accounts
+```
+
+This preserves the medicine catalogue, keeps available appointment times, preserves existing account passwords, creates the therapist login with `Demo@1234` if needed, and removes other registered users. The command is destructive to saved account activity.
+
+## Validation
 
 ```powershell
 pnpm test
@@ -88,41 +103,4 @@ pnpm lint
 pnpm build
 ```
 
-The build and server need a reachable PostgreSQL database because server-rendered app pages query Prisma.
-
-## Demo accounts
-
-All accounts use `Demo@1234`:
-
-| Role | Email | Demo state |
-| --- | --- | --- |
-| Patient | `patient1@demo.destiny` | Completed demo session and a prescription |
-| Patient | `patient2@demo.destiny` | Fresh assessment and booking journey |
-| Psychiatrist | `psychiatrist@demo.destiny` | Can issue demo prescriptions |
-| Counsellor | `counsellor@demo.destiny` | Pro console access; prescribing is disabled |
-
-## 5-minute walkthrough
-
-1. Register or sign in as `patient2@demo.destiny`.
-2. Open **Assessment**, choose a topic, and complete the questions. Keyboard `1`–`4` selects an answer; progress saves in browser local storage.
-3. Review the care report and open a suggested sample provider profile.
-4. Select an upcoming slot and confirm a demo booking. The booking API atomically reserves a slot, and writes an HTML confirmation preview under `.mail-previews/`.
-5. In **Appointments**, join when within 10 minutes before to 15 minutes after the slot start. Camera access is only used for the local preview; there is no remote connection or recording.
-6. End the session to mark the demo appointment completed and unlock daily check-ins.
-7. Sign in as `psychiatrist@demo.destiny`, open **Pro Console**, and issue a demo prescription for a completed session.
-8. Sign in as `patient1@demo.destiny`, open **E-Pharmacy**, and see the prescription-gated item alongside general wellness catalog entries. Checkout and order progression are simulated.
-
-## Implemented MVP behavior
-
-- Four 25-item check-in flows; PHQ-9/GAD-7/PSS-10/AUDIT/DAST score bands and the PHQ-9 item-9 safety flag.
-- Authenticated result reports, urgency messaging, and suggested sample professionals.
-- Professional directory filters and profile availability.
-- Transactional/conditional slot reservation to prevent double-booking.
-- Owner-checked session room access and bounded join window.
-- Daily habit check-ins unlocked by a completed session, with a 7-day progress visualization.
-- Prescription medicines can only be ordered when present on the patient's latest psychiatrist-issued prescription.
-- Prescription creation is restricted on the server to psychiatrists and completed sessions they conducted.
-
-## Before any real-world use
-
-This is a product demo, not a deployable clinical platform. Before processing real patient data or offering real care, the product needs clinical governance and validated assessment content, India-specific privacy/legal review, security and penetration testing, production-grade authorization/audit controls, data retention and deletion workflows, verified professional onboarding, crisis escalation design, real telehealth infrastructure, and regulated payment/pharmacy fulfillment. Never put real patient information into this MVP.
+The build and server require PostgreSQL to be reachable.

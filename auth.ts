@@ -7,6 +7,7 @@ import { z } from 'zod'
 const loginSchema = z.object({
   email: z.string().email(),
   password: z.string().min(6),
+  expectedRole: z.enum(['PATIENT', 'COUNSELLOR', 'THERAPIST', 'PSYCHIATRIST']),
 })
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
@@ -27,7 +28,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         if (!user) return null
 
         const valid = await bcrypt.compare(parsed.data.password, user.passwordHash)
-        if (!valid) return null
+        if (!valid || user.role !== parsed.data.expectedRole) return null
 
         return {
           id: user.id,
@@ -42,7 +43,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     jwt({ token, user }) {
       if (user) {
         token.id = user.id
-        token.role = (user as any).role
+        token.role = user.role
       }
       return token
     },

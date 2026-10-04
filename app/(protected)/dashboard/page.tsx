@@ -164,7 +164,7 @@ export default async function DashboardPage() {
 
         <footer className="mt-7 flex flex-col gap-2 rounded-2xl border border-rose-100 bg-rose-50/70 p-4 sm:flex-row sm:items-center sm:justify-between">
           <div><p className="text-xs font-semibold text-rose-950">Need urgent support?</p><p className="mt-1 text-[11px] leading-5 text-rose-900/70">If you’re in immediate danger in India, call <a href="tel:112" className="font-semibold underline">112</a>. Tele-MANAS: <a href="tel:14416" className="font-semibold underline">14416</a>.</p></div>
-          <span className="inline-flex items-center gap-1.5 text-[10px] text-rose-900/55"><BadgeCheck className="h-3.5 w-3.5" /> Demo product · not emergency care</span>
+          <span className="inline-flex items-center gap-1.5 text-[10px] text-rose-900/55"><BadgeCheck className="h-3.5 w-3.5" /> Not emergency care</span>
         </footer>
       </div>
     </div>

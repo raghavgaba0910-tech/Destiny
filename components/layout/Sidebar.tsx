@@ -13,7 +13,7 @@ const patientItems = [
   { href: '/counsellors', icon: MessageCircleHeart, label: 'Counsellors' },
   { href: '/appointments', icon: CalendarDays, label: 'Appointments' },
   { href: '/checkin', icon: CheckSquare, label: 'Daily care' },
-  { href: '/pharmacy', icon: ShoppingBag, label: 'Demo pharmacy' },
+  { href: '/pharmacy', icon: ShoppingBag, label: 'E-Pharmacy' },
 ]
 
 export function Sidebar({ name, email, role }: { name: string; email: string; role: string }) {
@@ -29,7 +29,7 @@ export function Sidebar({ name, email, role }: { name: string; email: string; ro
     <header className="sticky top-0 z-30 flex h-14 items-center justify-between border-b border-slate-200/80 bg-white/95 px-4 backdrop-blur lg:hidden">
       <Link href={isProfessional ? '/pro' : '/dashboard'} className="flex items-center gap-2.5">
         <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-[#171a32] text-white"><Activity className="h-4 w-4 text-teal" /></span>
-        <span className="text-sm font-semibold tracking-tight text-ink">destiny<span className="text-violet">.</span></span>
+        <span className="text-sm font-semibold tracking-tight text-ink">Destiny<span className="text-violet">.</span></span>
       </Link>
       <div className="flex items-center gap-2"><span className="max-w-28 truncate text-[10px] font-medium text-slate-500">{name}</span><button type="button" aria-label="Sign out" onClick={() => void signOut({ callbackUrl: '/' })} className="flex h-9 w-9 items-center justify-center rounded-xl text-slate-500 hover:bg-slate-100 hover:text-rose-700"><LogOut className="h-4 w-4" /></button></div>
     </header>
@@ -37,7 +37,7 @@ export function Sidebar({ name, email, role }: { name: string; email: string; ro
       <div className="border-b border-slate-100 px-5 py-5">
         <Link href={isProfessional ? '/pro' : '/dashboard'} className="flex items-center gap-3">
           <span className="flex h-10 w-10 items-center justify-center rounded-[14px] bg-[#171a32] text-white shadow-sm"><Activity className="h-5 w-5 text-teal" /></span>
-          <span><span className="block text-base font-semibold tracking-tight text-ink">destiny<span className="text-violet">.</span></span><span className="mt-0.5 block text-[9px] font-semibold uppercase tracking-[.14em] text-slate-400">Your care, your pace</span></span>
+          <span><span className="block text-base font-semibold tracking-tight text-ink">Destiny<span className="text-violet">.</span></span><span className="mt-0.5 block text-[9px] font-semibold uppercase tracking-[.14em] text-slate-400">Your care, your pace</span></span>
         </Link>
       </div>
 

@@ -35,7 +35,7 @@ function getDateKey(value: string) {
   return dateKeyFormat.format(new Date(value))
 }
 
-export function BookingSection({ professionalId, professionalName, pricePerSession }: { professionalId: string; professionalName: string; pricePerSession: number }) {
+export function BookingSection({ professionalId, professionalName, patientName, hasAssessment, pricePerSession }: { professionalId: string; professionalName: string; patientName: string; hasAssessment: boolean; pricePerSession: number }) {
   const [slots, setSlots] = useState<Slot[]>([])
   const [selected, setSelected] = useState('')
   const [selectedDay, setSelectedDay] = useState('')
@@ -45,6 +45,10 @@ export function BookingSection({ professionalId, professionalName, pricePerSessi
   const [busy, setBusy] = useState(false)
   const [loading, setLoading] = useState(true)
   const [loadError, setLoadError] = useState('')
+  const [intakeName, setIntakeName] = useState(patientName)
+  const [intakeAge, setIntakeAge] = useState('')
+  const [intakeGender, setIntakeGender] = useState<'MALE' | 'FEMALE' | 'OTHER'>('OTHER')
+  const [shareAssessment, setShareAssessment] = useState(hasAssessment)
   const router = useRouter()
 
   const loadSlots = useCallback(async () => {
@@ -91,14 +95,21 @@ export function BookingSection({ professionalId, professionalName, pricePerSessi
   const selectedSlot = slots.find((slot) => slot.id === selected)
 
   async function book() {
-    if (!selected) return
+    if (!selected || !selectedSlot || !intakeName.trim() || !intakeAge) return
     setBusy(true)
     setMessage('')
     try {
       const response = await fetch('/api/appointments', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ slotId: selected, professionalId }),
+        body: JSON.stringify({
+          slotId: selected,
+          professionalId,
+          patientName: intakeName.trim(),
+          patientAge: Number(intakeAge),
+          patientGender: intakeGender,
+          shareAssessment,
+        }),
       })
       const body = await response.json()
       if (!response.ok) {
@@ -168,13 +179,35 @@ export function BookingSection({ professionalId, professionalName, pricePerSessi
           </>
         ) : <div className="mt-4 rounded-xl bg-slate-50 p-4 text-xs leading-5 text-slate-500">No upcoming times are available right now. Please check again later.</div>}
 
-        {selectedSlot && <div className="mt-4 rounded-xl border border-indigo/10 bg-indigo/[0.035] p-3"><p className="text-[10px] font-semibold uppercase tracking-[.12em] text-indigo">Your selection</p><p className="mt-1 text-sm font-semibold text-ink">{dayLabelFormat.format(new Date(selectedSlot.startTime))} · {timeFormat.format(new Date(selectedSlot.startTime))} IST</p></div>}
+        {selectedSlot && <>
+          <div className="mt-4 rounded-xl border border-indigo/10 bg-indigo/[0.035] p-3"><p className="text-[10px] font-semibold uppercase tracking-[.12em] text-indigo">Your selection</p><p className="mt-1 text-sm font-semibold text-ink">{dayLabelFormat.format(new Date(selectedSlot.startTime))} · {timeFormat.format(new Date(selectedSlot.startTime))} IST</p></div>
+          <fieldset className="mt-5 space-y-3">
+            <legend className="mb-3 text-sm font-semibold text-ink">A few details for your professional</legend>
+            <label className="block space-y-1.5 text-xs font-medium text-slate-700">Name
+              <input required minLength={2} maxLength={100} autoComplete="name" value={intakeName} onChange={(event) => setIntakeName(event.target.value)} className="h-11 w-full rounded-xl border border-slate-200 bg-white px-3 text-sm font-normal focus:outline-none focus:ring-2 focus:ring-violet/20" />
+            </label>
+            <div className="grid grid-cols-2 gap-3">
+              <label className="block space-y-1.5 text-xs font-medium text-slate-700">Age
+                <input required type="number" min={1} max={120} inputMode="numeric" value={intakeAge} onChange={(event) => setIntakeAge(event.target.value)} className="h-11 w-full rounded-xl border border-slate-200 bg-white px-3 text-sm font-normal focus:outline-none focus:ring-2 focus:ring-violet/20" />
+              </label>
+              <label className="block space-y-1.5 text-xs font-medium text-slate-700">Gender
+                <select value={intakeGender} onChange={(event) => { const value = event.target.value; setIntakeGender(value === 'MALE' || value === 'FEMALE' ? value : 'OTHER') }} className="h-11 w-full rounded-xl border border-slate-200 bg-white px-3 text-sm font-normal focus:outline-none focus:ring-2 focus:ring-violet/20">
+                  <option value="MALE">Male</option><option value="FEMALE">Female</option><option value="OTHER">Other</option>
+                </select>
+              </label>
+            </div>
+            <label className="flex cursor-pointer items-start gap-2.5 rounded-xl border border-slate-200 bg-slate-50 p-3 text-xs leading-5 text-slate-600">
+              <input type="checkbox" checked={shareAssessment} disabled={!hasAssessment} onChange={(event) => setShareAssessment(event.target.checked)} className="mt-0.5 h-4 w-4 accent-indigo" />
+              <span>{hasAssessment ? `Share my latest assessment report with ${professionalName}. Uncheck to keep it private.` : 'No completed assessment report is available to share. Only the details above will be shared.'}</span>
+            </label>
+          </fieldset>
+        </>}
         {message && !bookingId && <p role="alert" className="mt-3 text-xs leading-5 text-rose-700">{message}</p>}
 
-        <button type="button" disabled={!selected || busy || loading} onClick={() => void book()} className="mt-5 inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-xl bg-[#171a32] px-4 text-sm font-semibold text-white shadow-sm transition hover:bg-indigo focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-violet/25 disabled:cursor-not-allowed disabled:bg-slate-300 disabled:shadow-none">
+        <button type="button" disabled={!selectedSlot || !intakeName.trim() || !intakeAge || Number(intakeAge) < 1 || Number(intakeAge) > 120 || busy || loading} onClick={() => void book()} className="mt-5 inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-xl bg-[#171a32] px-4 text-sm font-semibold text-white shadow-sm transition hover:bg-indigo focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-violet/25 disabled:cursor-not-allowed disabled:bg-slate-300 disabled:shadow-none">
           {busy ? 'Confirming your time…' : 'Confirm session'}{!busy && <ChevronRight className="h-4 w-4" />}
         </button>
-        <div className="mt-3 flex items-start justify-center gap-1.5 text-center text-[10px] leading-4 text-slate-400"><LockKeyhole className="mt-0.5 h-3 w-3 shrink-0" /><span>Demo booking · no payment collected · no real video connection</span></div>
+        <div className="mt-3 flex items-start justify-center gap-1.5 text-center text-[10px] leading-4 text-slate-400"><LockKeyhole className="mt-0.5 h-3 w-3 shrink-0" /><span>No payment is collected. The session room does not connect remote participants.</span></div>
       </div>
     </section>
   )

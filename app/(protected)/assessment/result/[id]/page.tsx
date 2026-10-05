@@ -7,10 +7,19 @@ import { getRecommendedProfessionals } from '@/lib/recommendations'
 import { assessmentTitles } from '@/lib/questions'
 import { PrintButton } from '@/components/destiny/PrintButton'
 
-export default async function AssessmentResultPage({ params }: { params: Promise<{ id: string }> }) {
+export default async function AssessmentResultPage({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ id: string }>
+  searchParams: Promise<{ email?: string }>
+}) {
   const session = await auth()
   if (!session?.user?.id) notFound()
-  const { id } = await params
+  const [{ id }, query] = await Promise.all([params, searchParams])
+  const emailStatus = query.email === 'sent' || query.email === 'preview' || query.email === 'failed'
+    ? query.email
+    : null
   const assessment = await db.assessment.findFirst({ where: { id, userId: session.user.id } })
   if (!assessment) notFound()
   const result = scoreAssessment(assessment.type, assessment.answers as number[])
@@ -19,6 +28,9 @@ export default async function AssessmentResultPage({ params }: { params: Promise
   const progress = Math.min(100, Math.round((result.score / maximum) * 100))
   return <main className="mx-auto max-w-5xl px-5 py-10 md:px-8">
     <p className="text-sm font-semibold uppercase tracking-[.18em] text-violet">Your care report</p><h1 className="mt-3 text-3xl font-bold">A moment to understand how you’re feeling</h1>
+    {emailStatus && <p role="status" className={`mt-5 rounded-2xl border p-4 text-sm ${emailStatus === 'sent' ? 'border-teal/30 bg-teal/10 text-teal' : emailStatus === 'preview' ? 'border-violet/25 bg-violet/5 text-violet' : 'border-amber-300 bg-amber-50 text-amber-900'}`}>
+      {emailStatus === 'sent' ? 'A confirmation email was sent to your registered email address.' : emailStatus === 'preview' ? 'Your report is saved. Email delivery is not configured; a local email preview was created.' : 'Your report is saved, but its email could not be delivered or saved as a preview.'}
+    </p>}
     <section className="mt-7 grid gap-7 rounded-3xl border bg-white p-6 md:grid-cols-[230px_1fr] md:p-9">
       <div className="mx-auto flex h-48 w-48 flex-col items-center justify-center rounded-full" style={{ background: `conic-gradient(#8B5CF6 ${progress}%, #ede9fe ${progress}% 100%)` }}><div className="flex h-36 w-36 flex-col items-center justify-center rounded-full bg-white"><span className="text-4xl font-bold">{result.score}</span><span className="text-xs text-muted-foreground">screening score</span></div></div>
       <div><span className="rounded-full bg-violet/10 px-3 py-1 text-sm font-semibold text-violet">{result.severity}</span><h2 className="mt-4 text-2xl font-bold">{assessmentTitles[assessment.type]}</h2><p className="mt-3 leading-7 text-muted-foreground">Your answers suggest {result.severity.toLowerCase()} right now. This result is a starting point for reflection, not a diagnosis. A qualified professional can help you understand what support may fit.</p>

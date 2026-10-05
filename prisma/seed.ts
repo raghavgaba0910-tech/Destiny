@@ -83,15 +83,10 @@ function makeTierSpec(tier: Tier, type: ProfType): ProfSpec {
   return { tier, type, experienceMin: 4, experienceMax: 10, ratingMin: 7, ratingMax: 10, priceMin: 2500, priceMax: 4000 }
 }
 
-// Build professional specs
-// Therapists: 7A, 7B, 6C. Among 20, 6 are psychiatrists: 2 from each tier
+// Seed ten sample professionals for each clinical role.
 const therapistSpecs: ProfSpec[] = [
-  // Tier A: 7 therapists (indices 0-6), 2 are psychiatrists (0,1)
-  ...Array.from({ length: 7 }, (_, i) => makeTierSpec('A', i < 2 ? 'PSYCHIATRIST' : 'THERAPIST')),
-  // Tier B: 7 therapists (indices 7-13), 2 are psychiatrists (7,8)
-  ...Array.from({ length: 7 }, (_, i) => makeTierSpec('B', i < 2 ? 'PSYCHIATRIST' : 'THERAPIST')),
-  // Tier C: 6 therapists (indices 14-19), 2 are psychiatrists (14,15)
-  ...Array.from({ length: 6 }, (_, i) => makeTierSpec('C', i < 2 ? 'PSYCHIATRIST' : 'THERAPIST')),
+  ...Array.from({ length: 10 }, (_, i) => makeTierSpec(i < 4 ? 'A' : i < 7 ? 'B' : 'C', 'PSYCHIATRIST')),
+  ...Array.from({ length: 10 }, (_, i) => makeTierSpec(i < 4 ? 'A' : i < 7 ? 'B' : 'C', 'THERAPIST')),
 ]
 
 const counsellorSpecs: ProfSpec[] = [

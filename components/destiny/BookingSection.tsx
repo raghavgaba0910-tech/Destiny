@@ -121,7 +121,7 @@ export function BookingSection({ professionalId, professionalName, patientName, 
       setBookedSlot(selectedSlot ?? null)
       setBookingId(body.id)
       setSelected('')
-      setMessage(body.previewWarning || '')
+      setMessage(body.emailMessage || '')
       await loadSlots()
     } catch (error) {
       setMessage(error instanceof Error ? error.message : 'We could not confirm your booking. Please try again.')

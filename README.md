@@ -58,23 +58,36 @@ Destiny is an India-focused mental wellbeing MVP with self-reflection assessment
 
 ## Sign-in accounts
 
-The existing four accounts use the password `Demo@1234`. The therapist login created by the final reset uses the same password. Select the matching role in **Log in as**.
+The reset creates 10 psychiatrists, 10 counsellors, and 10 therapists, each with a unique role-coded `DT#####` ID. Select the matching role in **Log in as**.
 
-| Role | Email |
+| Role | Login email |
 | --- | --- |
-| Patient with three upcoming sample appointments | `patient1@demo.destiny` |
-| Patient | `patient2@demo.destiny` |
-| Psychiatrist | `psychiatrist@demo.destiny` |
-| Counsellor | `counsellor@demo.destiny` |
-| Therapist | `therapist@demo.destiny` |
+| Psychiatrist | `psychiatrist.02@providers.destiny` |
+| Counsellor | `counsellor.02@providers.destiny` |
+| Therapist | `therapist.02@providers.destiny` |
 
-Each professional sees their unique `DT` ID in their workspace and provider profile. The final letter identifies the role: `T` therapist, `C` counsellor, `P` psychiatrist.
+The password for each is `Demo@1234`. Two patient accounts are also retained: `patient1@demo.destiny` and `patient2@demo.destiny`, with the same password. The final ID letter identifies the professional role: `T` therapist, `C` counsellor, `P` psychiatrist.
 
 ## Booking and report sharing
 
 Patients choose an available appointment time, then enter their name, age, and gender. If they have a completed assessment, its report is included for the professional by default; patients can uncheck the sharing option before confirming. The selected professional can view only the report attached to their appointment. If there is no completed assessment, only the appointment details are shared.
 
 The application transactionally reserves each slot to prevent two patients from booking it at once.
+
+## Email notifications
+
+Assessment completion and appointment booking create confirmation emails. With no SMTP settings, the app writes an HTML preview to `.mail-previews/` and reports that it was not delivered. To deliver emails, set these values in your private `.env` file:
+
+```dotenv
+SMTP_HOST=smtp.example.com
+SMTP_PORT=587
+SMTP_SECURE=false
+SMTP_USER=your-smtp-username
+SMTP_PASSWORD=your-smtp-password
+MAIL_FROM=Destiny <no-reply@example.com>
+```
+
+Use the host, port, TLS mode, and credentials provided by your email provider. Do not commit `.env` or real credentials. Email delivery problems are logged and shown as a notification; they do not undo a saved assessment or confirmed booking. Assessment emails link to the private, sign-in-protected report and do not include answers or scores.
 
 ## Conducting a session
 
@@ -86,13 +99,13 @@ The application transactionally reserves each slot to prevent two patients from 
 
 ## Reset local account data
 
-To remove all non-listed accounts and clear assessments, check-ins, appointments, prescriptions, and orders, while restoring the five sign-in accounts and one upcoming sample session per professional role, run:
+To clear assessments, check-ins, appointments, prescriptions, orders, and existing email previews, while keeping two patient accounts and restoring 10 professionals per role with available future slots, run:
 
 ```powershell
 pnpm db:reset-accounts
 ```
 
-This preserves the medicine catalogue, keeps available appointment times, preserves existing account passwords, creates the therapist login with `Demo@1234` if needed, and removes other registered users. The command is destructive to saved account activity.
+This command is destructive to saved account activity and removes any other registered users. It retains the medicine catalogue and creates the professional accounts listed above with the password `Demo@1234`.
 
 ## Validation
 

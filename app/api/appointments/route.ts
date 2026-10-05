@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
 import { auth } from '@/auth'
 import { db } from '@/lib/db'
-import { generateMailPreview } from '@/lib/mail'
+import { generateMailPreview, MailDeliveryError } from '@/lib/mail'
 import { PatientGender } from '@prisma/client'
 import { z } from 'zod'
 
@@ -77,14 +77,26 @@ export async function POST(request: Request) {
         include: { patient: true, professional: { include: { user: true } }, slot: true },
       })
     })
-    let previewWarning: string | undefined
+    let emailDelivery: 'sent' | 'preview' | 'failed' = 'failed'
+    let emailMessage: string
     try {
-      await generateMailPreview(appointment)
+      const email = await generateMailPreview({
+        id: appointment.id,
+        patientEmail: appointment.patient.email,
+        patientName: appointment.patientName,
+        professionalName: appointment.professional.user.name,
+        startTime: appointment.slot.startTime,
+        pricePerSession: appointment.professional.pricePerSession,
+      })
+      emailDelivery = email.delivery
+      emailMessage = email.message
     } catch (error) {
-      console.error('Booking email preview could not be written:', error)
-      previewWarning = 'Booking confirmed, but the local email preview could not be generated.'
+      console.error('Appointment confirmation email could not be delivered:', error)
+      emailMessage = error instanceof MailDeliveryError && error.previewSaved
+        ? 'Appointment booked, but email delivery failed. An HTML email preview was saved locally.'
+        : 'Appointment booked, but its email could not be sent or saved as a preview.'
     }
-    return NextResponse.json({ id: appointment.id, previewWarning }, { status: 201 })
+    return NextResponse.json({ id: appointment.id, emailDelivery, emailMessage }, { status: 201 })
   } catch (error) {
     if (error instanceof Error && error.message === 'SLOT_UNAVAILABLE') {
       return NextResponse.json({ error: 'That slot was just booked or is no longer available. Please choose another.' }, { status: 409 })

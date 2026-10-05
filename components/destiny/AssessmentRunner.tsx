@@ -52,7 +52,7 @@ export function AssessmentRunner({ type }: { type: AssessmentType }) {
       const body = await response.json()
       if (!response.ok) throw new Error(body.error || 'Could not save your assessment.')
       window.localStorage.removeItem(storageKey)
-      router.push(`/assessment/result/${body.id}`)
+      router.push(`/assessment/result/${body.id}?email=${body.emailDelivery}`)
     } catch (submitError) {
       setError(submitError instanceof Error ? submitError.message : 'Could not save your assessment.')
       setSubmitting(false)

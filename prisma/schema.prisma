@@ -13,6 +13,7 @@ model User {
   email        String   @unique
   passwordHash String
   role         Role     @default(PATIENT)
+  mustChangePassword Boolean @default(false)
   createdAt    DateTime @default(now())
 
   professional  Professional?
@@ -21,6 +22,8 @@ model User {
   checkins      CheckIn[]
   orders        Order[]
   prescriptions Prescription[] @relation("PatientPrescriptions")
+  supportTickets SupportTicket[] @relation("TicketRequester")
+  reviewedApplications ProfessionalApplication[] @relation("ApplicationReviewer")
 }
 
 enum Role {
@@ -28,6 +31,7 @@ enum Role {
   COUNSELLOR
   THERAPIST
   PSYCHIATRIST
+  ADMIN
 }
 
 model Professional {
@@ -43,6 +47,7 @@ model Professional {
   rating          Float
   pricePerSession Int
   tier            Tier
+  isApproved      Boolean  @default(true)
 
   slots        Slot[]
   appointments Appointment[] @relation("ProAppointments")
@@ -89,7 +94,7 @@ model Appointment {
   createdAt      DateTime          @default(now())
 
   prescriptions Prescription[]
-
+  supportTickets SupportTicket[]
 }
 
 enum PatientGender {
@@ -115,6 +120,7 @@ model Assessment {
   flagged   Boolean        @default(false)
   createdAt DateTime       @default(now())
   sharedAppointments Appointment[] @relation("SharedAssessment")
+  supportTickets SupportTicket[]
 }
 
 enum AssessmentType {
@@ -144,6 +150,9 @@ model Prescription {
   patientId     String
   patient       User        @relation("PatientPrescriptions", fields: [patientId], references: [id])
   medicines     Json
+  nextSessionAt DateTime?
+  followUpRequired Boolean @default(true)
+  followUpNotes String? @db.Text
   createdAt     DateTime    @default(now())
 }
 
@@ -163,8 +172,14 @@ model Order {
   items     Json
   total     Int
   status    OrderStatus @default(PLACED)
+  recipientName String?
+  phoneNumber String?
+  address String? @db.Text
+  postalCode String?
+  paymentMode PaymentMode?
   createdAt DateTime    @default(now())
   updatedAt DateTime    @updatedAt
+  supportTickets SupportTicket[]
 }
 
 enum OrderStatus {
@@ -172,4 +187,77 @@ enum OrderStatus {
   PACKED
   OUT_FOR_DELIVERY
   DELIVERED
+}
+
+enum PaymentMode {
+  CASH_ON_DELIVERY
+  UPI
+  CARD
+}
+
+model ProfessionalApplication {
+  id              String   @id @default(cuid())
+  name            String
+  gender          String
+  type            ProfType
+  experience      Int
+  email           String   @unique
+  phoneNumber     String
+  licenseImage    String   @db.Text
+  licenseMimeType String
+  status          ApplicationStatus @default(PENDING)
+  reviewNotes     String?  @db.Text
+  reviewedById    String?
+  reviewedBy      User?    @relation("ApplicationReviewer", fields: [reviewedById], references: [id], onDelete: SetNull)
+  reviewedAt      DateTime?
+  createdAt       DateTime @default(now())
+
+  @@index([status, createdAt])
+}
+
+enum ApplicationStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+model SupportTicket {
+  id                  String          @id @default(cuid())
+  requesterId         String
+  requester           User            @relation("TicketRequester", fields: [requesterId], references: [id], onDelete: Cascade)
+  category            SupportCategory
+  subject             String
+  message             String           @db.Text
+  relatedAppointmentId String?
+  relatedAppointment  Appointment?     @relation(fields: [relatedAppointmentId], references: [id], onDelete: SetNull)
+  relatedOrderId      String?
+  relatedOrder        Order?           @relation(fields: [relatedOrderId], references: [id], onDelete: SetNull)
+  relatedAssessmentId String?
+  relatedAssessment  Assessment?      @relation(fields: [relatedAssessmentId], references: [id], onDelete: SetNull)
+  status              SupportStatus    @default(OPEN)
+  adminResponse       String?          @db.Text
+  createdAt           DateTime         @default(now())
+  updatedAt           DateTime         @updatedAt
+
+  @@index([status, createdAt])
+  @@index([requesterId, createdAt])
+}
+
+enum SupportCategory {
+  APPOINTMENT_SCHEDULING
+  LIVE_SESSION
+  BILLING_REFUND_RECEIPT
+  PRIVACY_DATA_ACCOUNT
+  CLIENT_EHR_PLATFORM
+  PAYOUTS_CLAIMS_DUES
+  SESSION_INCONVENIENCE
+  CLIENT_MANAGEMENT
+  CONTACT_US
+  OTHER
+}
+
+enum SupportStatus {
+  OPEN
+  IN_PROGRESS
+  RESOLVED
 }

@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { Brain, CalendarDays, LayoutDashboard, ShoppingBag, Users } from 'lucide-react'
+import { Brain, CalendarDays, CircleHelp, LayoutDashboard, ShoppingBag, Users } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 const items = [
@@ -11,13 +11,17 @@ const items = [
   { href: '/assessment', icon: Brain, label: 'Check-in' },
   { href: '/appointments', icon: CalendarDays, label: 'Sessions' },
   { href: '/pharmacy', icon: ShoppingBag, label: 'Pharmacy' },
+  { href: '/helpdesk', icon: CircleHelp, label: 'Help desk' },
 ]
 
-export function BottomNav({ professional = false }: { professional?: boolean }) {
+export function BottomNav({ professional = false, admin = false }: { professional?: boolean; admin?: boolean }) {
   const pathname = usePathname()
   const navItems = professional ? [
     { href: '/pro', icon: LayoutDashboard, label: 'Workspace' },
     { href: '/appointments', icon: CalendarDays, label: 'Sessions' },
+    { href: '/helpdesk', icon: CircleHelp, label: 'Help desk' },
+  ] : admin ? [
+    { href: '/admin', icon: LayoutDashboard, label: 'Admin' },
   ] : items
   return (
     <nav aria-label="Mobile navigation" className="fixed inset-x-0 bottom-0 z-40 flex border-t border-slate-200/80 bg-white/95 pb-[env(safe-area-inset-bottom)] shadow-[0_-10px_30px_-24px_rgba(20,20,40,.4)] backdrop-blur lg:hidden">

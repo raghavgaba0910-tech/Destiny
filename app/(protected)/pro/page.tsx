@@ -3,7 +3,7 @@ import { auth } from '@/auth'
 import { db } from '@/lib/db'
 import { canPrescribe } from '@/lib/permissions'
 import { assessmentQuestions, assessmentTitles } from '@/lib/questions'
-import { notFound } from 'next/navigation'
+import { notFound, redirect } from 'next/navigation'
 import { CalendarDays, Clock3, FileText, UserRound } from 'lucide-react'
 import { PrescriptionForm } from '@/components/destiny/PrescriptionForm'
 
@@ -16,6 +16,7 @@ const roleLabels: Record<string, string> = {
 export default async function ProfessionalConsolePage() {
   const session = await auth()
   if (!session?.user?.id || session.user.role === 'PATIENT') notFound()
+  if (session.user.role === 'ADMIN') redirect('/admin')
 
   const professional = await db.professional.findUnique({
     where: { userId: session.user.id },
@@ -97,7 +98,7 @@ export default async function ProfessionalConsolePage() {
         <div className="mt-4 divide-y">{completed.map((appointment) => <div key={appointment.id} className="flex flex-wrap justify-between gap-2 py-3"><span className="font-medium">{appointment.patientName || appointment.patient.name}</span><span className="text-sm text-muted-foreground">{new Date(appointment.slot.startTime).toLocaleString('en-IN')}</span></div>)}{!completed.length && <p className="py-4 text-sm text-muted-foreground">No completed sessions yet.</p>}</div>
       </section>
 
-      {canPrescribe(session.user.role) && <section className="mt-7 rounded-3xl border bg-white p-5 sm:p-6"><h2 className="text-xl font-bold">Prescription pad</h2><div className="mt-4"><PrescriptionForm appointments={completed.map(({ id, patient }) => ({ id, patient }))} medicines={medicines} /></div></section>}
+      {completed.length > 0 && <section className="mt-7 rounded-3xl border bg-white p-5 sm:p-6"><h2 className="text-xl font-bold">{canPrescribe(session.user.role) ? 'Prescription pad' : 'Follow-up session plan'}</h2><p className="mt-1 text-sm text-muted-foreground">{canPrescribe(session.user.role) ? 'Only psychiatrists can issue medication prescriptions.' : 'Add a suggested next session and follow-up guidance for a completed session.'}</p><div className="mt-4"><PrescriptionForm appointments={completed.map(({ id, patientName }) => ({ id, patientName }))} medicines={medicines} canPrescribe={canPrescribe(session.user.role)} /></div></section>}
     </main>
   )
 }

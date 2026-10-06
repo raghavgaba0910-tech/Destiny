@@ -10,6 +10,7 @@ export async function getRecommendedProfessionals(recommendation: 'COUNSELLOR' |
   const professionals = await db.professional.findMany({
     where: {
       type: { in: typeMap[recommendation] },
+      isApproved: true,
       ...(specialties?.length ? { specialties: { hasSome: specialties } } : {}),
     },
     include: {

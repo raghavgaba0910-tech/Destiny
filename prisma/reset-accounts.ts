@@ -3,6 +3,7 @@ import bcrypt from 'bcryptjs'
 import { readdir, unlink } from 'node:fs/promises'
 import path from 'node:path'
 import { formatProfessionalCode } from '../lib/professional-code'
+import { getTierPrice } from '../lib/professional-pricing'
 
 const prisma = new PrismaClient()
 const defaultPassword = 'Demo@1234'
@@ -10,6 +11,7 @@ const patientDefinitions = [
   { email: 'patient1@demo.destiny', name: 'Aisha Sharma', role: 'PATIENT' as const },
   { email: 'patient2@demo.destiny', name: 'Rohan Mehta', role: 'PATIENT' as const },
 ]
+const adminDefinition = { email: 'admin@demo.destiny', name: 'Destiny Admin', role: 'ADMIN' as const }
 
 type ClinicianAccount = {
   email: string
@@ -72,11 +74,6 @@ function nextProfessionalCode(type: ProfType) {
   return formatProfessionalCode(allocatedId, type)
 }
 
-function professionalPrice(type: ProfType, index: number) {
-  const startingPrice = type === 'PSYCHIATRIST' ? 2600 : type === 'COUNSELLOR' ? 1400 : 1800
-  return startingPrice + (index % 4) * 250
-}
-
 async function main() {
   const passwordHash = await bcrypt.hash(defaultPassword, 12)
   const profileDefinitions = [
@@ -85,21 +82,27 @@ async function main() {
       const type = typeValue as ProfType
       return names.map(([name, specialties], index): ClinicianAccount => {
         const suffix = type === 'THERAPIST' ? 'therapist' : type === 'COUNSELLOR' ? 'counsellor' : 'psychiatrist'
+        const experience = 2 + index
+        const rating = 7.5 + (index % 5) * 0.4
+        const tier = index < 3 ? 'A' : index < 6 ? 'B' : 'C'
         return {
           email: `${suffix}.${String(index + 2).padStart(2, '0')}@providers.destiny`,
           name,
           role: type,
           type,
           specialties,
-          experience: 2 + index,
-          rating: 7.5 + (index % 5) * 0.4,
-          pricePerSession: professionalPrice(type, index),
-          tier: index < 3 ? 'A' : index < 6 ? 'B' : 'C',
+          experience,
+          rating,
+          pricePerSession: getTierPrice(tier, experience, rating),
+          tier,
         }
       })
     }),
-  ]
-  const allAccounts = [...patientDefinitions, ...profileDefinitions]
+  ].map((account) => ({
+    ...account,
+    pricePerSession: getTierPrice(account.tier, account.experience, account.rating),
+  }))
+  const allAccounts = [...patientDefinitions, adminDefinition, ...profileDefinitions]
   const accountEmails = allAccounts.map(({ email }) => email)
   const clinicianEmails = profileDefinitions.map(({ email }) => email)
 
@@ -113,14 +116,13 @@ async function main() {
       }))
     }
 
-    await Promise.all([
-      tx.prescription.deleteMany(),
-      tx.appointment.deleteMany(),
-      tx.assessment.deleteMany(),
-      tx.checkIn.deleteMany(),
-      tx.order.deleteMany(),
-    ])
-
+    await tx.supportTicket.deleteMany()
+    await tx.prescription.deleteMany()
+    await tx.appointment.deleteMany()
+    await tx.assessment.deleteMany()
+    await tx.checkIn.deleteMany()
+    await tx.order.deleteMany()
+    await tx.professionalApplication.deleteMany()
     await tx.slot.deleteMany()
     await tx.professional.deleteMany({ where: { user: { email: { notIn: clinicianEmails } } } })
     const removedUsers = await tx.user.deleteMany({ where: { email: { notIn: accountEmails } } })
@@ -151,6 +153,7 @@ async function main() {
           rating: Math.min(account.rating, 10),
           pricePerSession: account.pricePerSession,
           tier: account.tier,
+          isApproved: true,
         },
         create: {
           userId: user.id,
@@ -163,6 +166,7 @@ async function main() {
           rating: Math.min(account.rating, 10),
           pricePerSession: account.pricePerSession,
           tier: account.tier,
+          isApproved: true,
         },
       }))
     }
@@ -204,6 +208,8 @@ async function main() {
       checkins: await tx.checkIn.count(),
       prescriptions: await tx.prescription.count(),
       orders: await tx.order.count(),
+      supportTickets: await tx.supportTicket.count(),
+      pendingApplications: await tx.professionalApplication.count(),
       bookedSlots: await tx.slot.count({ where: { isBooked: true } }),
     }
     const preserved = {
@@ -231,6 +237,7 @@ async function main() {
       professionalIds: professionals.map(({ professionalCode }) => professionalCode),
       availableSlots: preserved.availableSlots,
       retainedMedicineCatalog: preserved.medicines,
+      demoAdmin: adminDefinition.email,
       remainingActivity: activity,
     }
   }, { timeout: 60_000 })

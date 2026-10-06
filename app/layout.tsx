@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import './globals.css'
 import { SessionProvider } from 'next-auth/react'
 import { auth } from '@/auth'
+import { ResetLegacyLocalData } from '@/components/destiny/ResetLegacyLocalData'
 
 export const metadata: Metadata = {
   title: 'Destiny — Mental Health for Young Adults',
@@ -14,6 +15,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
     <html lang="en" suppressHydrationWarning>
       <body>
         <SessionProvider session={session}>
+          <ResetLegacyLocalData />
           {children}
         </SessionProvider>
       </body>

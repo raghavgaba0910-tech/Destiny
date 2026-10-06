@@ -106,7 +106,7 @@ export function ProfessionalsPage({ professionals, heading }: { professionals: P
             <label className="block">
               <span className="sr-only">Filter by price tier</span>
               <select value={tier} onChange={(event) => updateFilter('tier', event.target.value)} className="h-12 w-full rounded-xl border border-slate-200 bg-slate-50 px-3 text-sm outline-none transition focus:border-violet focus:bg-white focus:ring-4 focus:ring-violet/10">
-                <option value="all">Any price tier</option><option value="A">Tier A · ₹</option><option value="B">Tier B · ₹₹</option><option value="C">Tier C · ₹₹₹</option>
+                <option value="all">Any price tier</option><option value="A">Tier 1 · ₹999–₹1,499</option><option value="B">Tier 2 · ₹1,999–₹2,499</option><option value="C">Tier 3 · ₹2,999–₹3,500</option>
               </select>
             </label>
             <label className="relative block">
@@ -136,6 +136,7 @@ export function ProfessionalsPage({ professionals, heading }: { professionals: P
                         <div className="min-w-0">
                           <div className="flex flex-wrap items-center gap-2">
                             <span className="rounded-full bg-violet/8 px-2.5 py-1 text-[10px] font-bold uppercase tracking-[.12em] text-violet">{person.type.toLowerCase()}</span>
+                            <span className="rounded-full bg-teal/10 px-2.5 py-1 text-[10px] font-semibold text-teal">Tier {person.tier === 'A' ? '1' : person.tier === 'B' ? '2' : '3'}</span>
                             <span className="rounded-full border border-slate-200 px-2.5 py-1 text-[10px] font-medium text-slate-500">{person.professionalCode}</span>
                           </div>
                           <h2 className="mt-2 truncate text-lg font-semibold tracking-tight text-ink">{person.user.name}</h2>

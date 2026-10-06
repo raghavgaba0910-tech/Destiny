@@ -11,7 +11,7 @@ const priceFormat = new Intl.NumberFormat('en-IN')
 export default async function ProfessionalProfilePage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
   const session = await auth()
-  const professional = await db.professional.findUnique({ where: { id }, include: { user: { select: { name: true } } } })
+  const professional = await db.professional.findFirst({ where: { id, isApproved: true }, include: { user: { select: { name: true } } } })
   if (!professional) notFound()
   const latestAssessment = session?.user?.role === 'PATIENT'
     ? await db.assessment.findFirst({ where: { userId: session.user.id }, select: { id: true } })
@@ -35,6 +35,7 @@ export default async function ProfessionalProfilePage({ params }: { params: Prom
             <div className="max-w-3xl">
               <div className="flex flex-wrap items-center gap-2">
                 <span className="rounded-full border border-white/15 bg-white/[.07] px-3 py-1 text-[10px] font-semibold uppercase tracking-[.14em] text-teal-100">{typeLabel}</span>
+                <span className="rounded-full border border-white/15 bg-white/[.07] px-3 py-1 text-[10px] font-medium text-white/80">Tier {professional.tier === 'A' ? '1' : professional.tier === 'B' ? '2' : '3'}</span>
                 <span className="rounded-full border border-white/15 bg-white/[.07] px-3 py-1 text-[10px] font-medium text-white/65">{professional.professionalCode}</span>
               </div>
               <h1 className="mt-3 text-3xl font-semibold tracking-tight md:text-4xl">{professional.user.name}</h1>

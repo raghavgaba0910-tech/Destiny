@@ -49,7 +49,7 @@ export async function POST(request: Request) {
         where: { id: parsed.data.slotId },
         include: { professional: true },
       })
-      if (!slot || slot.isBooked || slot.professionalId !== parsed.data.professionalId || slot.startTime <= new Date()) {
+      if (!slot || !slot.professional.isApproved || slot.isBooked || slot.professionalId !== parsed.data.professionalId || slot.startTime <= new Date()) {
         throw new Error('SLOT_UNAVAILABLE')
       }
       const locked = await tx.slot.updateMany({

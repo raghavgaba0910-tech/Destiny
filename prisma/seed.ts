@@ -1,6 +1,7 @@
 import { PrismaClient, ProfType, Tier, AppointmentStatus, OrderStatus } from '@prisma/client'
 import bcrypt from 'bcryptjs'
 import { formatProfessionalCode } from '@/lib/professional-code'
+import { getTierPrice } from '@/lib/professional-pricing'
 
 const prisma = new PrismaClient()
 
@@ -100,7 +101,9 @@ async function main() {
   
   // Clear existing data
   await prisma.order.deleteMany()
+  await prisma.supportTicket.deleteMany()
   await prisma.prescription.deleteMany()
+  await prisma.professionalApplication.deleteMany()
   await prisma.checkIn.deleteMany()
   await prisma.assessment.deleteMany()
   await prisma.appointment.deleteMany()
@@ -131,7 +134,7 @@ async function main() {
   async function seedProfessional(name: string, spec: ProfSpec, index: number) {
     const experience = randInt(spec.experienceMin, spec.experienceMax)
     const rating = randFloat(spec.ratingMin, spec.ratingMax)
-    const price = randInt(spec.priceMin, spec.priceMax)
+    const price = getTierPrice(spec.tier, experience, rating)
     const specialties = pick(SPECIALTIES, randInt(2, 3))
     const languages = Array.from(new Set([
       'Hindi',
@@ -145,8 +148,8 @@ async function main() {
       data: {
         name,
         email,
-        passwordHash: await bcrypt.hash('ProfDemo@123', 10),
-        role: role as any,
+        passwordHash: await bcrypt.hash('Demo@1234', 12),
+        role,
         professional: {
           create: {
             professionalCode: nextProfessionalCode(spec.type),
@@ -216,7 +219,7 @@ async function main() {
             bio: `${name} offers thoughtful, confidential support for young adults.`,
             experience: role === 'PSYCHIATRIST' ? 6 : 4,
             rating: role === 'PSYCHIATRIST' ? 9.2 : 8.5,
-            pricePerSession: role === 'PSYCHIATRIST' ? 3000 : role === 'COUNSELLOR' ? 1800 : 2200,
+            pricePerSession: getTierPrice('B', role === 'PSYCHIATRIST' ? 6 : 4, role === 'PSYCHIATRIST' ? 9.2 : role === 'COUNSELLOR' ? 8.1 : 8.5),
             tier: 'B',
           },
         },
@@ -261,6 +264,14 @@ async function main() {
       email: 'patient2@demo.destiny',
       passwordHash: await bcrypt.hash('Demo@1234', 12),
       role: 'PATIENT',
+    },
+  })
+  await prisma.user.create({
+    data: {
+      name: 'Destiny Admin',
+      email: 'admin@demo.destiny',
+      passwordHash: await bcrypt.hash('Demo@1234', 12),
+      role: 'ADMIN',
     },
   })
 

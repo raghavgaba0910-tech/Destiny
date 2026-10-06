@@ -26,7 +26,7 @@ const steps = [
 export default async function DashboardPage() {
   const session = await auth()
   if (!session?.user?.id) redirect('/login')
-  if (session.user.role !== 'PATIENT') redirect('/pro')
+  if (session.user.role !== 'PATIENT') redirect(session.user.role === 'ADMIN' ? '/admin' : '/pro')
 
   const [appointments, latestAssessment, checkins, completedCount, professionals] = await Promise.all([
     db.appointment.findMany({
@@ -43,7 +43,7 @@ export default async function DashboardPage() {
     db.checkIn.findMany({ where: { userId: session.user.id }, orderBy: { date: 'desc' }, take: 7 }),
     db.appointment.count({ where: { patientId: session.user.id, status: 'COMPLETED' } }),
     db.professional.findMany({
-      where: { type: { in: ['THERAPIST', 'PSYCHIATRIST'] } },
+      where: { type: { in: ['THERAPIST', 'PSYCHIATRIST'] }, isApproved: true },
       include: { user: { select: { name: true } } },
       orderBy: [{ rating: 'desc' }, { pricePerSession: 'asc' }],
       take: 3,

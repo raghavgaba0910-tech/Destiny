@@ -8,6 +8,7 @@ export async function GET(request: NextRequest) {
   const tier = ['A', 'B', 'C'].includes(searchParams.get('tier') ?? '') ? searchParams.get('tier') as 'A' | 'B' | 'C' : undefined
   const professionals = await db.professional.findMany({
     where: {
+      isApproved: true,
       ...(type ? { type } : {}),
       ...(tier ? { tier } : {}),
       ...(searchParams.get('specialty') ? { specialties: { has: searchParams.get('specialty') as string } } : {}),

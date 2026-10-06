@@ -58,15 +58,29 @@ Destiny is an India-focused mental wellbeing MVP with self-reflection assessment
 
 ## Sign-in accounts
 
-The reset creates 10 psychiatrists, 10 counsellors, and 10 therapists, each with a unique role-coded `DT#####` ID. Select the matching role in **Log in as**.
+The reset creates 10 psychiatrists, 10 counsellors, and 10 therapists, each with a unique role-coded `DT#####` ID. Professionals can sign in with their Destiny ID or email; select the matching role in **Log in as**. The reset also creates an admin account for application reviews and the help desk.
 
-| Role | Login email |
+| Role | Login |
 | --- | --- |
-| Psychiatrist | `psychiatrist.02@providers.destiny` |
-| Counsellor | `counsellor.02@providers.destiny` |
-| Therapist | `therapist.02@providers.destiny` |
+| Patient | `patient1@demo.destiny` or `patient2@demo.destiny` |
+| Psychiatrist | `psychiatrist@demo.destiny` (or a professional ID) |
+| Counsellor | `counsellor@demo.destiny` (or a professional ID) |
+| Therapist | `therapist@demo.destiny` (or a professional ID) |
+| Admin | `admin@demo.destiny` |
 
-The password for each is `Demo@1234`. Two patient accounts are also retained: `patient1@demo.destiny` and `patient2@demo.destiny`, with the same password. The final ID letter identifies the professional role: `T` therapist, `C` counsellor, `P` psychiatrist.
+The password for each demo account is `Demo@1234`. The final ID letter identifies the professional role: `T` therapist, `C` counsellor, `P` psychiatrist.
+
+## Professional registration and review
+
+Professionals can apply from **For professionals** on the public landing page. The application asks for name, gender, role, experience, email, phone, and a JPEG, PNG, or WebP license image (up to 2 MB). The application remains private and pending until an admin approves it. Approval creates the professional profile and available appointment slots, assigns a unique Destiny ID, and emails a temporary password. The professional signs in using the ID and must change the temporary password before using the workspace. With SMTP disabled, the email is saved as a local preview and the one-time password is shown in the admin review workspace.
+
+## Pricing, prescriptions, orders, and support
+
+Session fees are fixed within three experience/rating bands: Tier 1 is ₹999, ₹1,199, or ₹1,499; Tier 2 is ₹1,999, ₹2,199, or ₹2,499; Tier 3 is ₹2,999, ₹3,199, or ₹3,500. The selected fee is shown in the provider directory, profile, and booking confirmation. Sessions remain 50 minutes and no appointment payment is collected.
+
+After a completed appointment, psychiatrists can add medicines with dose, frequency, duration, and follow-up guidance. Patients see the prescription and suggested next session in the pharmacy workspace and can print/save it as PDF. Prescription-only items remain gated by a psychiatrist-issued prescription. Pharmacy checkout collects a recipient name, phone, delivery address, PIN code, and demo payment mode; no payment is processed and no order is fulfilled. A printable demo receipt is available for each order.
+
+Patients and all professional roles have a separate **Help desk** workspace. Requests can be linked to a session, order, or assessment report, and are visible to the admin workspace for status updates and replies. Assessment reports show the screening level, recommended next step, and recorded answers; use **Download report (save as PDF)** to print or save the report through the browser.
 
 ## Booking and report sharing
 
@@ -89,6 +103,8 @@ MAIL_FROM=Destiny <no-reply@example.com>
 
 Use the host, port, TLS mode, and credentials provided by your email provider. Do not commit `.env` or real credentials. Email delivery problems are logged and shown as a notification; they do not undo a saved assessment or confirmed booking. Assessment emails link to the private, sign-in-protected report and do not include answers or scores.
 
+Optional help-desk contact details can be shown in both role-specific panels by setting `SUPPORT_EMAIL` and `SUPPORT_PHONE` in `.env`. If they are not set, the panel directs users to submit a request through its form.
+
 ## Conducting a session
 
 1. Sign in with the appropriate professional role and open **Upcoming sessions** in the workspace.
@@ -99,13 +115,13 @@ Use the host, port, TLS mode, and credentials provided by your email provider. D
 
 ## Reset local account data
 
-To clear assessments, check-ins, appointments, prescriptions, orders, and existing email previews, while keeping two patient accounts and restoring 10 professionals per role with available future slots, run:
+To clear assessments, check-ins, appointments, prescriptions, orders, help desk requests, pending applications, and existing email previews, while keeping two patient accounts and restoring 10 professionals per role with available future slots plus the admin demo account, run:
 
 ```powershell
 pnpm db:reset-accounts
 ```
 
-This command is destructive to saved account activity and removes any other registered users. It retains the medicine catalogue and creates the professional accounts listed above with the password `Demo@1234`.
+This command is destructive to saved account activity and removes any other registered users or professional applications. It retains the medicine catalogue and creates the demo accounts listed above with the password `Demo@1234`. The app also clears older saved assessment drafts from browser local storage the first time it is opened after this reset release.
 
 ## Validation
 

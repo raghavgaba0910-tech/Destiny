@@ -3,7 +3,7 @@ import { ProfessionalsPage } from '@/components/destiny/ProfessionalsPage'
 
 export default async function TherapistsPage() {
   const professionals = await db.professional.findMany({
-    where: { type: { in: ['THERAPIST', 'PSYCHIATRIST'] } },
+    where: { type: { in: ['THERAPIST', 'PSYCHIATRIST'] }, isApproved: true },
     include: { user: { select: { name: true } } },
     orderBy: [{ rating: 'desc' }, { pricePerSession: 'asc' }],
   })

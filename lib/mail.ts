@@ -166,3 +166,28 @@ export async function sendAssessmentConfirmation(assessment: {
     html,
   })
 }
+
+export async function sendProfessionalWelcome(professional: {
+  id: string
+  to: string
+  name: string
+  professionalCode: string
+  temporaryPassword: string
+}) {
+  const html = `<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><title>Your Destiny professional account</title></head>
+<body style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;padding:40px 20px;background:#fbfaf8;color:#17182a">
+  <h1>Destiny</h1><h2>Welcome, ${escapeHtml(professional.name)}.</h2>
+  <p>Your professional application is approved.</p>
+  <p><strong>Destiny professional ID:</strong> ${escapeHtml(professional.professionalCode)}</p>
+  <p><strong>Sign-in email:</strong> ${escapeHtml(professional.to)}</p>
+  <p><strong>Temporary password:</strong> ${escapeHtml(professional.temporaryPassword)}</p>
+  <p>Sign in as your professional role and change this temporary password immediately at first login.</p>
+</body></html>`
+  return sendMailOrCreatePreview({
+    id: `professional-welcome-${professional.id}`,
+    to: professional.to,
+    subject: 'Your Destiny professional account is approved',
+    html,
+  })
+}

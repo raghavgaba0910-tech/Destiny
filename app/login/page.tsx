@@ -11,7 +11,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 
 const schema = z.object({
-  email: z.string().email('Enter a valid email'),
+  email: z.string().trim().min(1, 'Enter your email or professional ID'),
   password: z.string().min(6, 'Password must be at least 6 characters'),
 })
 
@@ -43,7 +43,7 @@ export default function LoginPage() {
         setError('We couldn’t sign you in with those details. Check your email and password, then try again.')
         return
       }
-      router.replace(role === 'PATIENT' ? '/dashboard' : '/pro')
+      router.replace(role === 'PATIENT' ? '/dashboard' : role === 'ADMIN' ? '/admin' : '/pro')
       router.refresh()
     } catch {
       setError('Sign-in is temporarily unavailable. Check your connection and try again.')
@@ -75,8 +75,8 @@ export default function LoginPage() {
           <h2 className="mt-2 text-3xl font-semibold tracking-tight text-ink">Welcome back</h2>
           <p className="mt-2 text-sm leading-6 text-slate-500">Sign in to continue your journey with Destiny.</p>
           <form onSubmit={handleSubmit} className="mt-8 space-y-5">
-            <div className="space-y-2"><Label htmlFor="email" className="text-xs font-semibold text-slate-700">Email address</Label><Input id="email" type="email" autoComplete="email" value={email} onChange={(event) => setEmail(event.target.value)} placeholder="you@example.com" className="h-12 rounded-xl border-slate-200 bg-white px-4 text-sm placeholder:text-slate-400 focus-visible:ring-violet/20" required /></div>
-            <div className="space-y-2"><Label htmlFor="login-role" className="text-xs font-semibold text-slate-700">Log in as</Label><select id="login-role" value={role} onChange={(event) => setRole(event.target.value)} className="h-12 w-full rounded-xl border border-slate-200 bg-white px-4 text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-violet/20"><option value="PATIENT">Patient</option><option value="PSYCHIATRIST">Psychiatrist</option><option value="COUNSELLOR">Counsellor</option><option value="THERAPIST">Therapist</option></select></div>
+            <div className="space-y-2"><Label htmlFor="email" className="text-xs font-semibold text-slate-700">{role === 'PATIENT' || role === 'ADMIN' ? 'Email address' : 'Destiny professional ID or email'}</Label><Input id="email" type="text" autoComplete="username" value={email} onChange={(event) => setEmail(event.target.value)} placeholder={role === 'PATIENT' || role === 'ADMIN' ? 'you@example.com' : 'DT00001P or email'} className="h-12 rounded-xl border-slate-200 bg-white px-4 text-sm placeholder:text-slate-400 focus-visible:ring-violet/20" required /></div>
+            <div className="space-y-2"><Label htmlFor="login-role" className="text-xs font-semibold text-slate-700">Log in as</Label><select id="login-role" value={role} onChange={(event) => setRole(event.target.value)} className="h-12 w-full rounded-xl border border-slate-200 bg-white px-4 text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-violet/20"><option value="PATIENT">Patient</option><option value="PSYCHIATRIST">Psychiatrist</option><option value="COUNSELLOR">Counsellor</option><option value="THERAPIST">Therapist</option><option value="ADMIN">Admin</option></select></div>
             <div className="space-y-2"><div className="flex items-center justify-between"><Label htmlFor="password" className="text-xs font-semibold text-slate-700">Password</Label></div><Input id="password" type="password" autoComplete="current-password" value={password} onChange={(event) => setPassword(event.target.value)} placeholder="Enter your password" className="h-12 rounded-xl border-slate-200 bg-white px-4 text-sm placeholder:text-slate-400 focus-visible:ring-violet/20" required /></div>
             {error && <p role="alert" className="rounded-xl border border-rose-200 bg-rose-50 px-3.5 py-3 text-xs leading-5 text-rose-800">{error}</p>}
             <Button type="submit" className="h-12 w-full rounded-xl bg-[#171a32] text-sm font-semibold text-white hover:bg-indigo" disabled={loading}>{loading ? 'Signing you in…' : <>Sign in <ArrowRight className="ml-2 h-4 w-4" /></>}</Button>

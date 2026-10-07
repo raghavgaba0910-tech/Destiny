@@ -108,6 +108,8 @@ Patients choose an available appointment time, then enter their name, age, and g
 
 The application transactionally reserves each slot to prevent two patients from booking it at once.
 
+New professional schedules use 10:00 AM, 12:00 PM, 3:00 PM, and 5:00 PM India Standard Time on weekdays. To update existing approved professionals' future unbooked availability to these times, run `pnpm db:update-professional-schedules`. This adds missing slots and removes old-time available slots while preserving booked appointments. The command uses `DATABASE_URL` from `.env`; if it points to the shared production database, the schedule change applies there too.
+
 ## Email notifications
 
 Assessment completion and appointment booking create confirmation emails. With no SMTP settings, the app writes an HTML preview to `.mail-previews/` and reports that it was not delivered. To deliver emails, set these values in your private `.env` file:

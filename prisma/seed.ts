@@ -2,6 +2,7 @@ import { PrismaClient, ProfType, Tier, AppointmentStatus, OrderStatus } from '@p
 import bcrypt from 'bcryptjs'
 import { formatProfessionalCode } from '@/lib/professional-code'
 import { getTierPrice } from '@/lib/professional-pricing'
+import { createProfessionalSchedule } from '@/lib/professional-schedule'
 
 const prisma = new PrismaClient()
 
@@ -43,13 +44,6 @@ function pick<T>(arr: T[], n: number): T[] {
 
 const SPECIALTIES = ['Anxiety', 'Depression', 'Trauma & PTSD', 'OCD', 'Relationship issues', 'Grief', 'Career stress', 'Substance use', 'Eating disorders', 'Sleep issues', 'ADHD', 'Self-esteem', 'Life transitions', 'LGBTQ+ affirming', 'Family conflict']
 const LANGUAGES = ['Hindi', 'English', 'Bengali', 'Tamil', 'Marathi', 'Kannada', 'Telugu', 'Gujarati']
-
-const SLOT_HOURS = [
-  { h: 10, m: 0 },
-  { h: 11, m: 30 },
-  { h: 15, m: 0 },
-  { h: 16, m: 30 },
-]
 
 const THERAPIST_NAMES = [
   'Dr. Ananya Krishnan', 'Dr. Rohan Mehta', 'Dr. Priya Iyer', 'Dr. Vikram Nair', 'Dr. Sanya Patel',
@@ -167,26 +161,9 @@ async function main() {
       include: { professional: true }
     })
 
-    // Seed slots for next 21 weekdays
-    const today = new Date()
-    today.setHours(0, 0, 0, 0)
-    const slotData = []
-    let daysAdded = 0
-    let d = new Date(today)
-    while (daysAdded < 21) {
-      const dayOfWeek = d.getDay()
-      if (dayOfWeek !== 0 && dayOfWeek !== 6) {
-        for (const { h, m } of SLOT_HOURS) {
-          const slotTime = new Date(d)
-          slotTime.setHours(h, m, 0, 0)
-          slotData.push({ professionalId: user.professional!.id, startTime: slotTime })
-        }
-        daysAdded++
-      }
-      d.setDate(d.getDate() + 1)
-    }
-
-    await prisma.slot.createMany({ data: slotData })
+    await prisma.slot.createMany({
+      data: createProfessionalSchedule(user.professional!.id),
+    })
 
     return { id: user.id, professional: { id: user.professional!.id, type: spec.type } }
   }
@@ -227,22 +204,9 @@ async function main() {
       include: { professional: true },
     })
 
-    const slotData: { professionalId: string; startTime: Date }[] = []
-    const day = new Date()
-    day.setHours(0, 0, 0, 0)
-    let weekdaysAdded = 0
-    while (weekdaysAdded < 21) {
-      if (day.getDay() !== 0 && day.getDay() !== 6) {
-        for (const { h, m } of SLOT_HOURS) {
-          const startTime = new Date(day)
-          startTime.setHours(h, m, 0, 0)
-          slotData.push({ professionalId: professional.professional!.id, startTime })
-        }
-        weekdaysAdded += 1
-      }
-      day.setDate(day.getDate() + 1)
-    }
-    await prisma.slot.createMany({ data: slotData })
+    await prisma.slot.createMany({
+      data: createProfessionalSchedule(professional.professional!.id),
+    })
     return professional
   }
 

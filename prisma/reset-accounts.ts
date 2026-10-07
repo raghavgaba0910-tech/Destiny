@@ -4,6 +4,7 @@ import { readdir, unlink } from 'node:fs/promises'
 import path from 'node:path'
 import { formatProfessionalCode } from '../lib/professional-code'
 import { getTierPrice } from '../lib/professional-pricing'
+import { createProfessionalSchedule } from '../lib/professional-schedule'
 
 const prisma = new PrismaClient()
 const defaultPassword = 'Demo@1234'
@@ -171,23 +172,7 @@ async function main() {
       }))
     }
 
-    const slots: { professionalId: string; startTime: Date }[] = []
-    for (const professional of professionals) {
-      const day = new Date()
-      day.setHours(0, 0, 0, 0)
-      let weekdaysAdded = 0
-      while (weekdaysAdded < 21) {
-        if (day.getDay() !== 0 && day.getDay() !== 6) {
-          for (const [hour, minute] of [[10, 0], [11, 30], [15, 0], [16, 30]]) {
-            const startTime = new Date(day)
-            startTime.setHours(hour, minute, 0, 0)
-            slots.push({ professionalId: professional.id, startTime })
-          }
-          weekdaysAdded += 1
-        }
-        day.setDate(day.getDate() + 1)
-      }
-    }
+    const slots = professionals.flatMap((professional) => createProfessionalSchedule(professional.id))
     await tx.slot.createMany({ data: slots })
 
     const typeCounts = await tx.professional.groupBy({ by: ['type'], _count: { _all: true } })

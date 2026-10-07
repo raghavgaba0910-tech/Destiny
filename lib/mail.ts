@@ -24,6 +24,14 @@ export class MailDeliveryError extends Error {
   }
 }
 
+async function saveMailPreview(mail: MailMessage): Promise<string> {
+  const previewDir = process.env.MAIL_PREVIEW_DIR || '.mail-previews'
+  const filename = path.join(previewDir, `${mail.id}.html`)
+  await fs.mkdir(previewDir, { recursive: true })
+  await fs.writeFile(filename, mail.html, 'utf-8')
+  return filename
+}
+
 function escapeHtml(value: string): string {
   return value.replace(/[&<>"']/g, (character) => ({
     '&': '&amp;',
@@ -64,22 +72,29 @@ function getMailTransport() {
 }
 
 export async function sendMailOrCreatePreview(mail: MailMessage): Promise<MailResult> {
-  const previewDir = process.env.MAIL_PREVIEW_DIR || '.mail-previews'
-  await fs.mkdir(previewDir, { recursive: true })
-  const filename = path.join(previewDir, `${mail.id}.html`)
-  await fs.writeFile(filename, mail.html, 'utf-8')
-
   let config: ReturnType<typeof getMailTransport>
   try {
     config = getMailTransport()
   } catch (error) {
-    throw new MailDeliveryError('Email configuration is invalid.', true, error)
+    let previewSaved = false
+    try {
+      await saveMailPreview(mail)
+      previewSaved = true
+    } catch (previewError) {
+      console.error('Could not save email preview after SMTP configuration failed:', previewError)
+    }
+    throw new MailDeliveryError('Email configuration is invalid.', previewSaved, error)
   }
   if (!config) {
-    console.info(`Email delivery is not configured. Preview written to ${filename}`)
-    return {
-      delivery: 'preview',
-      message: 'Email preview saved locally. Configure SMTP settings in .env to deliver emails to inboxes.',
+    try {
+      const filename = await saveMailPreview(mail)
+      console.info(`Email delivery is not configured. Preview written to ${filename}`)
+      return {
+        delivery: 'preview',
+        message: 'Email preview saved locally. Configure SMTP settings in .env to deliver emails to inboxes.',
+      }
+    } catch (error) {
+      throw new MailDeliveryError('Email delivery is not configured and the preview could not be saved.', false, error)
     }
   }
 
@@ -91,7 +106,14 @@ export async function sendMailOrCreatePreview(mail: MailMessage): Promise<MailRe
       html: mail.html,
     })
   } catch (error) {
-    throw new MailDeliveryError('Email provider rejected or could not deliver the message.', true, error)
+    let previewSaved = false
+    try {
+      await saveMailPreview(mail)
+      previewSaved = true
+    } catch (previewError) {
+      console.error('Could not save email preview after SMTP delivery failed:', previewError)
+    }
+    throw new MailDeliveryError('Email provider rejected or could not deliver the message.', previewSaved, error)
   }
   return { delivery: 'sent', message: 'A confirmation email was sent to your registered email address.' }
 }

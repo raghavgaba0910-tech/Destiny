@@ -1,3 +1,9 @@
 [build]
   command = "pnpm run build"
   publish = ".next"
+
+# Ensure the Next.js runtime runs on every deploy (production and previews).
+# Without it, the raw .next folder is published as static files, no server
+# functions are created, and every route returns "Page not found".
+[[plugins]]
+  package = "@netlify/plugin-nextjs"

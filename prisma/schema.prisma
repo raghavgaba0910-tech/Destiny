@@ -4,27 +4,183 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
 }
 
 model User {
-  id           String   @id @default(cuid())
-  name         String
-  email        String   @unique
-  passwordHash String
-  role         Role     @default(PATIENT)
-  mustChangePassword Boolean @default(false)
-  createdAt    DateTime @default(now())
-
-  professional  Professional?
-  appointments  Appointment[]  @relation("PatientAppointments")
-  assessments   Assessment[]
-  checkins      CheckIn[]
-  orders        Order[]
-  prescriptions Prescription[] @relation("PatientPrescriptions")
-  supportTickets SupportTicket[] @relation("TicketRequester")
+  id                   String                    @id @default(cuid())
+  name                 String
+  email                String                    @unique
+  passwordHash         String
+  role                 Role                      @default(PATIENT)
+  createdAt            DateTime                  @default(now())
+  mustChangePassword   Boolean                   @default(false)
+  appointments         Appointment[]             @relation("PatientAppointments")
+  assessments          Assessment[]
+  checkins             CheckIn[]
+  orders               Order[]
+  prescriptions        Prescription[]            @relation("PatientPrescriptions")
+  professional         Professional?
   reviewedApplications ProfessionalApplication[] @relation("ApplicationReviewer")
+  supportTickets       SupportTicket[]           @relation("TicketRequester")
+}
+
+model Professional {
+  id               String        @id @default(cuid())
+  userId           String        @unique
+  type             ProfType
+  specialties      String[]
+  languages        String[]
+  bio              String
+  experience       Int
+  rating           Float
+  pricePerSession  Int
+  tier             Tier
+  professionalCode String        @unique
+  isApproved       Boolean       @default(true)
+  appointments     Appointment[] @relation("ProAppointments")
+  user             User          @relation(fields: [userId], references: [id])
+  slots            Slot[]
+}
+
+model Slot {
+  id             String       @id @default(cuid())
+  professionalId String
+  startTime      DateTime
+  isBooked       Boolean      @default(false)
+  appointment    Appointment?
+  professional   Professional @relation(fields: [professionalId], references: [id])
+
+  @@unique([professionalId, startTime])
+}
+
+model Appointment {
+  id                 String            @id @default(cuid())
+  patientId          String
+  professionalId     String
+  slotId             String            @unique
+  status             AppointmentStatus @default(UPCOMING)
+  createdAt          DateTime          @default(now())
+  patientName        String
+  patientAge         Int
+  patientGender      PatientGender
+  sharedAssessmentId String?
+  patient            User              @relation("PatientAppointments", fields: [patientId], references: [id])
+  professional       Professional      @relation("ProAppointments", fields: [professionalId], references: [id])
+  sharedAssessment   Assessment?       @relation("SharedAssessment", fields: [sharedAssessmentId], references: [id])
+  slot               Slot              @relation(fields: [slotId], references: [id])
+  prescriptions      Prescription[]
+  supportTickets     SupportTicket[]
+}
+
+model Assessment {
+  id                 String          @id @default(cuid())
+  userId             String
+  type               AssessmentType
+  answers            Json
+  score              Int
+  severity           String
+  flagged            Boolean         @default(false)
+  createdAt          DateTime        @default(now())
+  sharedAppointments Appointment[]   @relation("SharedAssessment")
+  user               User            @relation(fields: [userId], references: [id])
+  supportTickets     SupportTicket[]
+}
+
+model CheckIn {
+  id          String   @id @default(cuid())
+  userId      String
+  date        DateTime @default(now()) @db.Date
+  medication  Boolean  @default(false)
+  exercise    Boolean  @default(false)
+  meditation  Boolean  @default(false)
+  supplements Boolean  @default(false)
+  user        User     @relation(fields: [userId], references: [id])
+
+  @@unique([userId, date])
+}
+
+model Prescription {
+  id               String      @id @default(cuid())
+  appointmentId    String
+  patientId        String
+  medicines        Json
+  createdAt        DateTime    @default(now())
+  followUpNotes    String?
+  followUpRequired Boolean     @default(true)
+  nextSessionAt    DateTime?
+  appointment      Appointment @relation(fields: [appointmentId], references: [id])
+  patient          User        @relation("PatientPrescriptions", fields: [patientId], references: [id])
+}
+
+model Medicine {
+  id          String @id @default(cuid())
+  name        String
+  type        String
+  description String
+  price       Int
+  category    String
+}
+
+model Order {
+  id             String          @id @default(cuid())
+  userId         String
+  items          Json
+  total          Int
+  status         OrderStatus     @default(PLACED)
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+  address        String?
+  paymentMode    PaymentMode?
+  phoneNumber    String?
+  postalCode     String?
+  recipientName  String?
+  user           User            @relation(fields: [userId], references: [id])
+  supportTickets SupportTicket[]
+}
+
+model ProfessionalApplication {
+  id              String            @id @default(cuid())
+  name            String
+  gender          String
+  type            ProfType
+  experience      Int
+  email           String            @unique
+  phoneNumber     String
+  licenseImage    String
+  licenseMimeType String
+  status          ApplicationStatus @default(PENDING)
+  reviewNotes     String?
+  reviewedById    String?
+  reviewedAt      DateTime?
+  createdAt       DateTime          @default(now())
+  reviewedBy      User?             @relation("ApplicationReviewer", fields: [reviewedById], references: [id])
+
+  @@index([status, createdAt])
+}
+
+model SupportTicket {
+  id                   String          @id @default(cuid())
+  requesterId          String
+  category             SupportCategory
+  subject              String
+  message              String
+  relatedAppointmentId String?
+  relatedOrderId       String?
+  relatedAssessmentId  String?
+  status               SupportStatus   @default(OPEN)
+  adminResponse        String?
+  createdAt            DateTime        @default(now())
+  updatedAt            DateTime        @updatedAt
+  relatedAppointment   Appointment?    @relation(fields: [relatedAppointmentId], references: [id])
+  relatedAssessment    Assessment?     @relation(fields: [relatedAssessmentId], references: [id])
+  relatedOrder         Order?          @relation(fields: [relatedOrderId], references: [id])
+  requester            User            @relation("TicketRequester", fields: [requesterId], references: [id], onDelete: Cascade)
+
+  @@index([status, createdAt])
+  @@index([requesterId, createdAt])
 }
 
 enum Role {
@@ -33,25 +189,6 @@ enum Role {
   THERAPIST
   PSYCHIATRIST
   ADMIN
-}
-
-model Professional {
-  id              String   @id @default(cuid())
-  professionalCode String  @unique
-  userId          String   @unique
-  user            User     @relation(fields: [userId], references: [id])
-  type            ProfType
-  specialties     String[]
-  languages       String[]
-  bio             String
-  experience      Int
-  rating          Float
-  pricePerSession Int
-  tier            Tier
-  isApproved      Boolean  @default(true)
-
-  slots        Slot[]
-  appointments Appointment[] @relation("ProAppointments")
 }
 
 enum ProfType {
@@ -66,38 +203,6 @@ enum Tier {
   C
 }
 
-model Slot {
-  id             String   @id @default(cuid())
-  professionalId String
-  professional   Professional @relation(fields: [professionalId], references: [id])
-  startTime      DateTime
-  isBooked       Boolean  @default(false)
-
-  appointment Appointment?
-
-  @@unique([professionalId, startTime])
-}
-
-model Appointment {
-  id             String            @id @default(cuid())
-  patientId      String
-  patient        User              @relation("PatientAppointments", fields: [patientId], references: [id])
-  patientName    String
-  patientAge     Int
-  patientGender  PatientGender
-  professionalId String
-  professional   Professional      @relation("ProAppointments", fields: [professionalId], references: [id])
-  slotId         String            @unique
-  slot           Slot              @relation(fields: [slotId], references: [id])
-  status         AppointmentStatus @default(UPCOMING)
-  sharedAssessmentId String?
-  sharedAssessment Assessment? @relation("SharedAssessment", fields: [sharedAssessmentId], references: [id], onDelete: SetNull)
-  createdAt      DateTime          @default(now())
-
-  prescriptions Prescription[]
-  supportTickets SupportTicket[]
-}
-
 enum PatientGender {
   MALE
   FEMALE
@@ -110,77 +215,11 @@ enum AppointmentStatus {
   CANCELLED
 }
 
-model Assessment {
-  id        String         @id @default(cuid())
-  userId    String
-  user      User           @relation(fields: [userId], references: [id])
-  type      AssessmentType
-  answers   Json
-  score     Int
-  severity  String
-  flagged   Boolean        @default(false)
-  createdAt DateTime       @default(now())
-  sharedAppointments Appointment[] @relation("SharedAssessment")
-  supportTickets SupportTicket[]
-}
-
 enum AssessmentType {
   DEPRESSION
   ANXIETY
   SUBSTANCE
   STRESS
-}
-
-model CheckIn {
-  id          String   @id @default(cuid())
-  userId      String
-  user        User     @relation(fields: [userId], references: [id])
-  date        DateTime @default(now()) @db.Date
-  medication  Boolean  @default(false)
-  exercise    Boolean  @default(false)
-  meditation  Boolean  @default(false)
-  supplements Boolean  @default(false)
-
-  @@unique([userId, date])
-}
-
-model Prescription {
-  id            String      @id @default(cuid())
-  appointmentId String
-  appointment   Appointment @relation(fields: [appointmentId], references: [id])
-  patientId     String
-  patient       User        @relation("PatientPrescriptions", fields: [patientId], references: [id])
-  medicines     Json
-  nextSessionAt DateTime?
-  followUpRequired Boolean @default(true)
-  followUpNotes String? @db.Text
-  createdAt     DateTime    @default(now())
-}
-
-model Medicine {
-  id          String @id @default(cuid())
-  name        String
-  type        String
-  description String
-  price       Int
-  category    String
-}
-
-model Order {
-  id        String      @id @default(cuid())
-  userId    String
-  user      User        @relation(fields: [userId], references: [id])
-  items     Json
-  total     Int
-  status    OrderStatus @default(PLACED)
-  recipientName String?
-  phoneNumber String?
-  address String? @db.Text
-  postalCode String?
-  paymentMode PaymentMode?
-  createdAt DateTime    @default(now())
-  updatedAt DateTime    @updatedAt
-  supportTickets SupportTicket[]
 }
 
 enum OrderStatus {
@@ -196,52 +235,10 @@ enum PaymentMode {
   CARD
 }
 
-model ProfessionalApplication {
-  id              String   @id @default(cuid())
-  name            String
-  gender          String
-  type            ProfType
-  experience      Int
-  email           String   @unique
-  phoneNumber     String
-  licenseImage    String   @db.Text
-  licenseMimeType String
-  status          ApplicationStatus @default(PENDING)
-  reviewNotes     String?  @db.Text
-  reviewedById    String?
-  reviewedBy      User?    @relation("ApplicationReviewer", fields: [reviewedById], references: [id], onDelete: SetNull)
-  reviewedAt      DateTime?
-  createdAt       DateTime @default(now())
-
-  @@index([status, createdAt])
-}
-
 enum ApplicationStatus {
   PENDING
   APPROVED
   REJECTED
-}
-
-model SupportTicket {
-  id                  String          @id @default(cuid())
-  requesterId         String
-  requester           User            @relation("TicketRequester", fields: [requesterId], references: [id], onDelete: Cascade)
-  category            SupportCategory
-  subject             String
-  message             String           @db.Text
-  relatedAppointmentId String?
-  relatedAppointment  Appointment?     @relation(fields: [relatedAppointmentId], references: [id], onDelete: SetNull)
-  relatedOrderId      String?
-  relatedOrder        Order?           @relation(fields: [relatedOrderId], references: [id], onDelete: SetNull)
-  relatedAssessmentId String?
-  relatedAssessment  Assessment?      @relation(fields: [relatedAssessmentId], references: [id], onDelete: SetNull)
-  status              SupportStatus    @default(OPEN)
-  adminResponse       String?          @db.Text
-  createdAt           DateTime         @default(now())
-  updatedAt           DateTime         @updatedAt
-
-  @@index([status, createdAt])
-  @@index([requesterId, createdAt])
 }
 
 enum SupportCategory {

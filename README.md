@@ -58,7 +58,7 @@ Destiny is an India-focused mental wellbeing MVP with self-reflection assessment
 
 ## Sign-in accounts
 
-The reset creates 10 psychiatrists, 10 counsellors, and 10 therapists, each with a unique role-coded `DT#####` ID. Professionals can sign in with their Destiny ID or email; select the matching role in **Log in as**. The reset also creates an admin account for application reviews and the help desk.
+The reset creates 10 psychiatrists, 10 counsellors, and 10 therapists, each with a unique role-coded `DT#####` ID. **For professionals** opens the application form at `/professional-register`; an admin reviews each application before an account is created. Approved professionals sign in through the separate `/professional-login` page using the Destiny ID or email and temporary password sent to their registered email, then change the temporary password at first sign-in. Admin sign-in is also available on that page. Patients use the separate **For patients** portal to sign in or create an account.
 
 | Role | Login |
 | --- | --- |
@@ -69,6 +69,26 @@ The reset creates 10 psychiatrists, 10 counsellors, and 10 therapists, each with
 | Admin | `admin@demo.destiny` |
 
 The password for each demo account is `Demo@1234`. The final ID letter identifies the professional role: `T` therapist, `C` counsellor, `P` psychiatrist.
+
+## Create or reset an admin account
+
+`pnpm db:create-admin` creates an admin account without clearing or reseeding other data. It reads `DATABASE_URL` and `SMTP_USER` from `.env`. The admin email comes from `ADMIN_EMAIL` if set, otherwise from `SMTP_USER`. The command requires `ADMIN_PASSWORD` in the current shell. The password must be at least 12 characters and include a lowercase letter, uppercase letter, number, and symbol. If the email already belongs to a non-admin account, the command refuses to promote it. Re-running it for an existing admin resets that admin's password.
+
+In PowerShell, enter the password at a hidden prompt and run:
+
+```powershell
+$securePassword = Read-Host "Admin password" -AsSecureString
+$passwordPointer = [Runtime.InteropServices.Marshal]::SecureStringToBSTR($securePassword)
+try {
+  $env:ADMIN_PASSWORD = [Runtime.InteropServices.Marshal]::PtrToStringBSTR($passwordPointer)
+  pnpm db:create-admin
+} finally {
+  [Runtime.InteropServices.Marshal]::ZeroFreeBSTR($passwordPointer)
+  Remove-Item Env:ADMIN_PASSWORD
+}
+```
+
+To use a different admin email instead of `SMTP_USER`, set `$env:ADMIN_EMAIL` before running the command. The local and production environments use the same database, so this command changes the production database. Do not use `pnpm db:seed` for this; that command clears and rebuilds application data.
 
 ## Professional registration and review
 
@@ -102,6 +122,8 @@ MAIL_FROM=Destiny <no-reply@example.com>
 ```
 
 Use the host, port, TLS mode, and credentials provided by your email provider. Do not commit `.env` or real credentials. Email delivery problems are logged and shown as a notification; they do not undo a saved assessment or confirmed booking. Assessment emails link to the private, sign-in-protected report and do not include answers or scores.
+
+After configuring SMTP in a deployment, sign in as admin and use **Send test email** in the professional applications panel. The test message goes to `SMTP_USER`; the status confirms whether the SMTP server accepted it, not whether it reached the inbox. For production, set the same SMTP variables in the hosting provider's production environment and redeploy; local `.env` settings do not configure Vercel. Check spam/junk and the hosting function logs if delivery is still missing.
 
 Optional help-desk contact details can be shown in both role-specific panels by setting `SUPPORT_EMAIL` and `SUPPORT_PHONE` in `.env`. If they are not set, the panel directs users to submit a request through its form.
 

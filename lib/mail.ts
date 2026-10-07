@@ -96,6 +96,42 @@ export async function sendMailOrCreatePreview(mail: MailMessage): Promise<MailRe
   return { delivery: 'sent', message: 'A confirmation email was sent to your registered email address.' }
 }
 
+export async function sendSmtpTestEmail(): Promise<MailResult> {
+  let config: ReturnType<typeof getMailTransport>
+  try {
+    config = getMailTransport()
+  } catch (error) {
+    throw new MailDeliveryError('Email configuration is invalid.', false, error)
+  }
+  if (!config) {
+    return {
+      delivery: 'preview',
+      message: 'SMTP is not configured in this deployment. No test email was sent.',
+    }
+  }
+
+  const recipient = process.env.SMTP_USER
+  if (!recipient) {
+    throw new MailDeliveryError('SMTP_USER must be set to receive the test email.', false, null)
+  }
+
+  try {
+    await config.transporter.sendMail({
+      from: config.from,
+      to: recipient,
+      subject: 'Destiny SMTP delivery test',
+      text: 'This test confirms that Destiny can submit email through the configured SMTP server. It does not confirm inbox placement.',
+    })
+  } catch (error) {
+    throw new MailDeliveryError('The SMTP server did not accept the test email.', false, error)
+  }
+
+  return {
+    delivery: 'sent',
+    message: 'The SMTP server accepted a test email for the configured SMTP_USER address. Check its inbox and spam folder.',
+  }
+}
+
 export async function generateMailPreview(appointment: {
   id: string
   patientEmail: string

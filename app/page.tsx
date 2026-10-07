@@ -36,11 +36,9 @@ export default async function HomePage() {
             <a href="#faq" className="transition hover:text-violet">FAQs</a>
           </div>
           <div className="flex items-center gap-2">
-            <Link href="/professional-register" className="inline-flex min-h-10 items-center rounded-xl px-2 text-[10px] font-semibold text-slate-700 transition hover:bg-slate-100 sm:px-3 sm:text-xs">For professionals</Link>
-            {session?.user ? <Link href={homeHref} className="inline-flex min-h-10 items-center gap-2 rounded-xl bg-[#171a32] px-4 text-xs font-semibold text-white transition hover:bg-indigo">My space <ArrowRight className="h-3.5 w-3.5" /></Link> : <>
-              <Link href="/login" className="hidden min-h-10 items-center rounded-xl px-3 text-xs font-semibold text-slate-700 transition hover:bg-slate-100 sm:inline-flex">Log in</Link>
-              <Link href="/register" className="inline-flex min-h-10 items-center gap-2 rounded-xl bg-[#171a32] px-4 text-xs font-semibold text-white transition hover:bg-indigo">Create account <ArrowUpRight className="h-3.5 w-3.5" /></Link>
-            </>}
+            <Link href="/professional-register" className="inline-flex min-h-10 items-center justify-center rounded-xl border border-slate-200 bg-white px-3 text-[10px] font-semibold text-slate-700 shadow-sm transition hover:border-violet/30 hover:bg-slate-50 sm:px-4 sm:text-xs">For professionals</Link>
+            <Link href="/for-patients" className="inline-flex min-h-10 items-center justify-center rounded-xl bg-[#171a32] px-3 text-[10px] font-semibold text-white shadow-sm transition hover:bg-indigo sm:px-4 sm:text-xs">For patients</Link>
+            {session?.user && <Link href={homeHref} className="inline-flex min-h-10 items-center gap-2 rounded-xl bg-[#171a32] px-4 text-xs font-semibold text-white transition hover:bg-indigo">My space <ArrowRight className="h-3.5 w-3.5" /></Link>}
           </div>
         </nav>
       </header>
@@ -143,7 +141,7 @@ export default async function HomePage() {
             <div><p className="text-xs font-semibold text-rose-950">Need immediate support in India?</p><p className="mt-1 text-xs leading-5 text-rose-950/70">Call emergency services <a href="tel:112" className="font-bold underline">112</a> or contact Tele-MANAS at <a href="tel:14416" className="font-bold underline">14416</a>.</p><p className="mt-1 text-[10px] text-rose-950/55">Destiny does not replace emergency care.</p></div>
             <Link href={startHref} className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl bg-[#171a32] px-4 text-xs font-semibold text-white transition hover:bg-indigo">Take a small first step <ArrowRight className="h-3.5 w-3.5" /></Link>
           </div>
-          <div className="flex flex-col gap-3 py-6 sm:flex-row sm:items-center sm:justify-between"><Link href="/" className="flex items-center gap-2 text-sm font-semibold"><span className="flex h-7 w-7 items-center justify-center rounded-lg bg-[#171a32] text-white"><Sparkles className="h-3.5 w-3.5 text-teal" /></span> Destiny.</Link><p className="text-[10px] leading-5 text-slate-500">Provider profiles are illustrative and not verified. Destiny is not a clinical service. Please do not enter real health information.</p><div className="flex gap-4 text-[10px] font-medium text-slate-500"><Link href="/login" className="hover:text-indigo">Log in</Link><Link href="/register" className="hover:text-indigo">Create account</Link></div></div>
+          <div className="flex flex-col gap-3 py-6 sm:flex-row sm:items-center sm:justify-between"><Link href="/" className="flex items-center gap-2 text-sm font-semibold"><span className="flex h-7 w-7 items-center justify-center rounded-lg bg-[#171a32] text-white"><Sparkles className="h-3.5 w-3.5 text-teal" /></span> Destiny.</Link><p className="text-[10px] leading-5 text-slate-500">Provider profiles are illustrative and not verified. Destiny is not a clinical service. Please do not enter real health information.</p><div className="flex gap-4 text-[10px] font-medium text-slate-500"><Link href="/professional-register" className="hover:text-indigo">For professionals</Link><Link href="/for-patients" className="hover:text-indigo">For patients</Link></div></div>
         </div>
       </footer>
     </main>

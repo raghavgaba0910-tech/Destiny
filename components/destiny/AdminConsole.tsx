@@ -50,6 +50,23 @@ export function AdminConsole({ applications, tickets }: { applications: Applicat
   const [statuses, setStatuses] = useState<Record<string, string>>({})
   const [message, setMessage] = useState('')
   const [busyId, setBusyId] = useState('')
+  const [testingEmail, setTestingEmail] = useState(false)
+
+  async function sendEmailTest() {
+    setTestingEmail(true)
+    setMessage('')
+    try {
+      const response = await fetch('/api/admin/email-test', { method: 'POST' })
+      const body = await response.json()
+      setMessage(response.ok
+        ? body.message
+        : body.error || 'SMTP test failed. Check the deployment logs and email settings.')
+    } catch {
+      setMessage('SMTP test request failed. Check your connection and try again.')
+    } finally {
+      setTestingEmail(false)
+    }
+  }
 
   async function review(id: string, decision: 'APPROVE' | 'REJECT') {
     setBusyId(id)
@@ -66,7 +83,9 @@ export function AdminConsole({ applications, tickets }: { applications: Applicat
         return
       }
       if (decision === 'APPROVE') {
-        setMessage(`Approved ${body.professionalCode}. Temporary password: ${body.temporaryPassword}. ${body.emailMessage}`)
+        setMessage(body.emailDelivery === 'sent'
+          ? `Approved ${body.professionalCode}. ${body.emailMessage}`
+          : `Approved ${body.professionalCode}. Email status: ${body.emailMessage} Temporary password: ${body.temporaryPassword}`)
       } else {
         setMessage('Application rejected. The applicant may submit a new application.')
       }
@@ -107,7 +126,7 @@ export function AdminConsole({ applications, tickets }: { applications: Applicat
   return <div className="space-y-8">
     {message && <p role="status" className="rounded-xl bg-teal/10 p-3 text-sm">{message}</p>}
     <section className="rounded-3xl border bg-white p-5 sm:p-6">
-      <div className="flex flex-wrap items-end justify-between gap-3"><div><h2 className="text-xl font-bold">Professional applications</h2><p className="mt-1 text-sm text-slate-500">Review uploaded licenses before creating a professional account.</p></div><span className="rounded-full bg-violet/10 px-3 py-1 text-xs font-semibold text-violet">{applications.length} pending</span></div>
+      <div className="flex flex-wrap items-end justify-between gap-3"><div><h2 className="text-xl font-bold">Professional applications</h2><p className="mt-1 text-sm text-slate-500">Review uploaded licenses before creating a professional account.</p></div><div className="flex items-center gap-2"><span className="rounded-full bg-violet/10 px-3 py-1 text-xs font-semibold text-violet">{applications.length} pending</span><button type="button" disabled={testingEmail} onClick={() => void sendEmailTest()} className="rounded-lg border border-slate-200 px-3 py-2 text-xs font-semibold text-slate-700 transition hover:bg-slate-50 disabled:opacity-50">{testingEmail ? 'Sending test…' : 'Send test email'}</button></div></div>
       <div className="mt-5 space-y-4">
         {applications.map((application) => <article key={application.id} className="rounded-2xl border p-4">
           <div className="grid gap-4 md:grid-cols-[1fr_220px]">

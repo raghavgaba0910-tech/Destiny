@@ -60,7 +60,7 @@ export default function ProfessionalRegistrationPage() {
         setError(body.error || 'We could not submit your application.')
         return
       }
-      setMessage('Application submitted for admin review. If approved, your Destiny professional ID and temporary password will be emailed to you.')
+      setMessage('Application submitted for admin review. No account is created until approval. If approved, your Destiny professional ID and temporary password will be sent to your registered email address.')
       setForm(initialForm)
       setLicenseImage('')
       setFileName('')
@@ -78,7 +78,7 @@ export default function ProfessionalRegistrationPage() {
         <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-teal/10 text-teal"><BadgeCheck className="h-6 w-6" /></div>
         <p className="mt-5 text-xs font-semibold uppercase tracking-[.16em] text-teal">Professional onboarding</p>
         <h1 className="mt-2 text-3xl font-bold">Apply to join Destiny</h1>
-        <p className="mt-2 text-sm leading-6 text-slate-600">Applications are reviewed before a professional account can sign in or appear in the directory. Use fictional information for this application.</p>
+        <p className="mt-2 text-sm leading-6 text-slate-600">This is an application, not instant account registration. An admin reviews your details and license. If approved, your Destiny ID and temporary password will be emailed to you. Use fictional information for this application.</p>
         <form onSubmit={(event) => void submit(event)} className="mt-7 grid gap-4 sm:grid-cols-2">
           <label className="text-sm font-medium">Full name<input required maxLength={100} autoComplete="name" value={form.name} onChange={(event) => setForm({ ...form, name: event.target.value })} className="mt-1 h-11 w-full rounded-xl border px-3" /></label>
           <label className="text-sm font-medium">Gender<select required value={form.gender} onChange={(event) => setForm({ ...form, gender: event.target.value })} className="mt-1 h-11 w-full rounded-xl border bg-white px-3"><option value="">Select</option><option>Female</option><option>Male</option><option>Non-binary</option><option>Prefer not to say</option></select></label>
@@ -91,7 +91,7 @@ export default function ProfessionalRegistrationPage() {
           {error && <p role="alert" className="sm:col-span-2 rounded-xl bg-rose-50 p-3 text-sm text-rose-800">{error}</p>}
           <button disabled={busy} className="sm:col-span-2 rounded-xl bg-[#171a32] px-4 py-3 font-semibold text-white disabled:opacity-50">{busy ? 'Submitting…' : 'Submit for review'}</button>
         </form>
-        <p className="mt-5 text-xs text-slate-500">Already approved? <Link href="/login" className="font-semibold text-indigo">Sign in to your professional account</Link>.</p>
+        <p className="mt-5 text-xs text-slate-500">Already approved? <Link href="/professional-login" className="font-semibold text-indigo">Sign in to your professional account</Link>.</p>
       </section>
     </div>
   </main>

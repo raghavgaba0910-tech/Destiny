@@ -73,6 +73,9 @@ model Appointment {
   slot               Slot              @relation(fields: [slotId], references: [id])
   prescriptions      Prescription[]
   supportTickets     SupportTicket[]
+
+  @@index([patientId, status])
+  @@index([professionalId, status])
 }
 
 model Assessment {
@@ -87,6 +90,8 @@ model Assessment {
   sharedAppointments Appointment[]   @relation("SharedAssessment")
   user               User            @relation(fields: [userId], references: [id])
   supportTickets     SupportTicket[]
+
+  @@index([userId, createdAt])
 }
 
 model CheckIn {
@@ -113,6 +118,8 @@ model Prescription {
   nextSessionAt    DateTime?
   appointment      Appointment @relation(fields: [appointmentId], references: [id])
   patient          User        @relation("PatientPrescriptions", fields: [patientId], references: [id])
+
+  @@index([patientId, createdAt])
 }
 
 model Medicine {
@@ -139,6 +146,8 @@ model Order {
   recipientName  String?
   user           User            @relation(fields: [userId], references: [id])
   supportTickets SupportTicket[]
+
+  @@index([userId, createdAt])
 }
 
 model ProfessionalApplication {

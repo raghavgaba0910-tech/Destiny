@@ -4,6 +4,8 @@ import { db } from '@/lib/db'
 import { generateMailPreview, MailDeliveryError } from '@/lib/mail'
 import { PatientGender } from '@prisma/client'
 import { z } from 'zod'
+import { sanitizeText } from '@/lib/sanitize'
+import { checkRateLimit, getClientIp } from '@/lib/rate-limit'
 
 const bookingSchema = z.object({
   slotId: z.string().min(1),
@@ -17,6 +19,9 @@ const bookingSchema = z.object({
 export async function GET() {
   const session = await auth()
   if (!session?.user?.id) return NextResponse.json({ error: 'Sign in required.' }, { status: 401 })
+  if (session.user.role === 'ADMIN') {
+    return NextResponse.json([])
+  }
   const where = session.user.role === 'PATIENT' ? { patientId: session.user.id } : { professional: { userId: session.user.id } }
   const appointments = await db.appointment.findMany({
     where,
@@ -33,7 +38,18 @@ export async function GET() {
 
 export async function POST(request: Request) {
   const session = await auth()
-  if (!session?.user?.id || session.user.role !== 'PATIENT') return NextResponse.json({ error: 'Patient sign-in required.' }, { status: 401 })
+  if (!session?.user?.id || session.user.role !== 'PATIENT') return NextResponse.json({ error: 'Patient sign-in required.' }, { status: 403 })
+
+  // Rate limiting to prevent slot reservation exhaustion
+  const ip = getClientIp(request)
+  const rateLimit = checkRateLimit(`booking:${session.user.id}:${ip}`, { windowMs: 10 * 60_000, maxRequests: 10 })
+  if (!rateLimit.success) {
+    return NextResponse.json(
+      { error: 'Too many booking attempts. Please wait a moment.' },
+      { status: 429, headers: { 'Retry-After': String(Math.ceil(rateLimit.resetMs / 1000)) } }
+    )
+  }
+
   let body: unknown
   try {
     body = await request.json()
@@ -42,6 +58,11 @@ export async function POST(request: Request) {
   }
   const parsed = bookingSchema.safeParse(body)
   if (!parsed.success) return NextResponse.json({ error: 'Choose a valid session slot.' }, { status: 400 })
+
+  const cleanPatientName = sanitizeText(parsed.data.patientName, 100)
+  if (cleanPatientName.length < 2) {
+    return NextResponse.json({ error: 'Please enter a valid patient name.' }, { status: 400 })
+  }
 
   try {
     const appointment = await db.$transaction(async (tx) => {
@@ -67,7 +88,7 @@ export async function POST(request: Request) {
       return tx.appointment.create({
         data: {
           patientId: session.user.id,
-          patientName: parsed.data.patientName,
+          patientName: cleanPatientName,
           patientAge: parsed.data.patientAge,
           patientGender: parsed.data.patientGender,
           professionalId: slot.professionalId,

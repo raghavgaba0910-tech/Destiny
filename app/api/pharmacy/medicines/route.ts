@@ -4,7 +4,8 @@ import { db } from '@/lib/db'
 
 export async function GET() {
   const session = await auth()
-  if (!session?.user?.id || session.user.role !== 'PATIENT') return NextResponse.json({ error: 'Patient sign-in required.' }, { status: 401 })
+  if (!session?.user?.id) return NextResponse.json({ error: 'Sign in required.' }, { status: 401 })
+  if (session.user.role !== 'PATIENT') return NextResponse.json({ error: 'Patient sign-in required.' }, { status: 403 })
   const [medicines, prescriptions, orders] = await Promise.all([
     db.medicine.findMany({ orderBy: [{ type: 'asc' }, { name: 'asc' }] }),
     db.prescription.findMany({

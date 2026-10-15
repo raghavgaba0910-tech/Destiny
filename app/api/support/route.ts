@@ -3,6 +3,8 @@ import { SupportCategory } from '@prisma/client'
 import { z } from 'zod'
 import { auth } from '@/auth'
 import { db } from '@/lib/db'
+import { sanitizeText } from '@/lib/sanitize'
+import { checkRateLimit, getClientIp } from '@/lib/rate-limit'
 
 const schema = z.object({
   category: z.nativeEnum(SupportCategory),
@@ -17,6 +19,17 @@ export async function POST(request: Request) {
   if (!session?.user?.id || !['PATIENT', 'COUNSELLOR', 'THERAPIST', 'PSYCHIATRIST'].includes(session.user.role)) {
     return NextResponse.json({ error: 'Patient or professional sign-in required.' }, { status: 403 })
   }
+
+  // Rate limiting support requests
+  const ip = getClientIp(request)
+  const rateLimit = checkRateLimit(`support:${session.user.id}:${ip}`, { windowMs: 10 * 60_000, maxRequests: 10 })
+  if (!rateLimit.success) {
+    return NextResponse.json(
+      { error: 'Too many support requests. Please try again later.' },
+      { status: 429, headers: { 'Retry-After': String(Math.ceil(rateLimit.resetMs / 1000)) } }
+    )
+  }
+
   let body: unknown
   try {
     body = await request.json()
@@ -25,6 +38,14 @@ export async function POST(request: Request) {
   }
   const parsed = schema.safeParse(body)
   if (!parsed.success) return NextResponse.json({ error: 'Add a subject and at least 10 characters describing your issue.' }, { status: 400 })
+
+  const cleanSubject = sanitizeText(parsed.data.subject, 120)
+  const cleanMessage = sanitizeText(parsed.data.message, 3000)
+
+  if (cleanSubject.length < 3 || cleanMessage.length < 10) {
+    return NextResponse.json({ error: 'Provide a valid subject and message.' }, { status: 400 })
+  }
+
   const patientCategories: SupportCategory[] = [
     'APPOINTMENT_SCHEDULING',
     'LIVE_SESSION',
@@ -79,8 +100,8 @@ export async function POST(request: Request) {
     data: {
       requesterId: session.user.id,
       category: parsed.data.category,
-      subject: parsed.data.subject,
-      message: parsed.data.message,
+      subject: cleanSubject,
+      message: cleanMessage,
       ...related,
     },
     select: { id: true, status: true },

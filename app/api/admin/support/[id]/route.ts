@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import { z } from 'zod'
 import { auth } from '@/auth'
 import { db } from '@/lib/db'
+import { sanitizeText } from '@/lib/sanitize'
 
 const schema = z.object({
   status: z.enum(['OPEN', 'IN_PROGRESS', 'RESOLVED']),
@@ -20,9 +21,10 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
   const parsed = schema.safeParse(body)
   if (!parsed.success) return NextResponse.json({ error: 'Provide a valid support status and response.' }, { status: 400 })
   const { id } = await params
+  const cleanResponse = parsed.data.adminResponse ? sanitizeText(parsed.data.adminResponse, 2000) : null
   const updated = await db.supportTicket.updateMany({
     where: { id },
-    data: { status: parsed.data.status, adminResponse: parsed.data.adminResponse || null },
+    data: { status: parsed.data.status, adminResponse: cleanResponse },
   })
   if (!updated.count) return NextResponse.json({ error: 'Support ticket not found.' }, { status: 404 })
   return NextResponse.json({ status: parsed.data.status })

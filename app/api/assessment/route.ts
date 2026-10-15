@@ -6,6 +6,7 @@ import { scoreAssessment } from '@/lib/scoring'
 import { AssessmentType } from '@prisma/client'
 import { z } from 'zod'
 import { MailDeliveryError, sendAssessmentConfirmation } from '@/lib/mail'
+import { checkRateLimit, getClientIp } from '@/lib/rate-limit'
 
 const schema = z.object({
   type: z.nativeEnum(AssessmentType),
@@ -14,7 +15,18 @@ const schema = z.object({
 
 export async function POST(request: Request) {
   const session = await auth()
-  if (!session?.user?.id || session.user.role !== 'PATIENT') return NextResponse.json({ error: 'Patient sign-in required.' }, { status: 401 })
+  if (!session?.user?.id) return NextResponse.json({ error: 'Sign in required.' }, { status: 401 })
+  if (session.user.role !== 'PATIENT') return NextResponse.json({ error: 'Patient sign-in required.' }, { status: 403 })
+
+  const ip = getClientIp(request)
+  const rateLimit = checkRateLimit(`assessment:${session.user.id}:${ip}`, { windowMs: 10 * 60_000, maxRequests: 15 })
+  if (!rateLimit.success) {
+    return NextResponse.json(
+      { error: 'Too many assessment attempts. Please wait a moment.' },
+      { status: 429, headers: { 'Retry-After': String(Math.ceil(rateLimit.resetMs / 1000)) } }
+    )
+  }
+
   let body: unknown
   try {
     body = await request.json()

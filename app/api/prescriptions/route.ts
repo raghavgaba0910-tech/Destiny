@@ -3,6 +3,8 @@ import { auth } from '@/auth'
 import { db } from '@/lib/db'
 import { canPrescribe } from '@/lib/permissions'
 import { z } from 'zod'
+import { sanitizeText } from '@/lib/sanitize'
+import { checkRateLimit, getClientIp } from '@/lib/rate-limit'
 
 const medicineSchema = z.object({
   name: z.string().trim().min(1).max(120),
@@ -26,6 +28,16 @@ export async function POST(request: Request) {
   if (!session?.user?.id || !['COUNSELLOR', 'THERAPIST', 'PSYCHIATRIST'].includes(session.user.role)) {
     return NextResponse.json({ error: 'Professional sign-in required.' }, { status: 403 })
   }
+
+  const ip = getClientIp(request)
+  const rateLimit = checkRateLimit(`prescription:${session.user.id}:${ip}`, { windowMs: 10 * 60_000, maxRequests: 20 })
+  if (!rateLimit.success) {
+    return NextResponse.json(
+      { error: 'Too many prescription requests. Please wait a moment.' },
+      { status: 429, headers: { 'Retry-After': String(Math.ceil(rateLimit.resetMs / 1000)) } }
+    )
+  }
+
   let body: unknown
   try {
     body = await request.json()
@@ -44,19 +56,30 @@ export async function POST(request: Request) {
     where: { id: parsed.data.appointmentId, status: 'COMPLETED', professional: { userId: session.user.id } },
   })
   if (!appointment) return NextResponse.json({ error: 'Completed session not found for this psychiatrist.' }, { status: 404 })
+
+  const sanitizedMedicines = parsed.data.medicines.map((item) => ({
+    name: sanitizeText(item.name, 120),
+    dose: sanitizeText(item.dose, 100),
+    frequency: item.frequency,
+    duration: sanitizeText(item.duration, 100),
+  }))
+
   const medicines = await db.medicine.findMany({
-    where: { name: { in: parsed.data.medicines.map(({ name }) => name) }, type: 'PRESCRIPTION' },
+    where: { name: { in: sanitizedMedicines.map(({ name }) => name) }, type: 'PRESCRIPTION' },
     select: { name: true },
   })
-  if (medicines.length !== parsed.data.medicines.length) return NextResponse.json({ error: 'Choose only available prescription medicines.' }, { status: 400 })
+  if (medicines.length !== sanitizedMedicines.length) return NextResponse.json({ error: 'Choose only available prescription medicines.' }, { status: 400 })
+
+  const cleanFollowUp = parsed.data.followUpNotes ? sanitizeText(parsed.data.followUpNotes, 1000) : null
+
   const prescription = await db.prescription.create({
     data: {
       appointmentId: appointment.id,
       patientId: appointment.patientId,
-      medicines: parsed.data.medicines,
+      medicines: sanitizedMedicines,
       nextSessionAt: parsed.data.nextSessionAt ? new Date(parsed.data.nextSessionAt) : null,
       followUpRequired: parsed.data.followUpRequired,
-      followUpNotes: parsed.data.followUpNotes || null,
+      followUpNotes: cleanFollowUp,
     },
   })
   return NextResponse.json({ id: prescription.id }, { status: 201 })

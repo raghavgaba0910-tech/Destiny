@@ -7,6 +7,7 @@ import { formatProfessionalCode } from '@/lib/professional-code'
 import { getTierPrice } from '@/lib/professional-pricing'
 import { createProfessionalSchedule } from '@/lib/professional-schedule'
 import { MailDeliveryError, sendProfessionalWelcome } from '@/lib/mail'
+import { sanitizeText } from '@/lib/sanitize'
 import bcrypt from 'bcryptjs'
 
 const reviewSchema = z.object({
@@ -31,12 +32,14 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
   const application = await db.professionalApplication.findFirst({ where: { id, status: 'PENDING' } })
   if (!application) return NextResponse.json({ error: 'Pending application not found.' }, { status: 404 })
 
+  const cleanReviewNotes = parsed.data.reviewNotes ? sanitizeText(parsed.data.reviewNotes, 1000) : null
+
   if (parsed.data.decision === 'REJECT') {
     const result = await db.professionalApplication.updateMany({
       where: { id, status: 'PENDING' },
       data: {
         status: 'REJECTED',
-        reviewNotes: parsed.data.reviewNotes || null,
+        reviewNotes: cleanReviewNotes,
         reviewedById: session.user.id,
         reviewedAt: new Date(),
       },
@@ -95,7 +98,7 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
         where: { id, status: 'PENDING' },
         data: {
           status: 'APPROVED',
-          reviewNotes: parsed.data.reviewNotes || null,
+          reviewNotes: cleanReviewNotes,
           reviewedById: session.user.id,
           reviewedAt: new Date(),
         },

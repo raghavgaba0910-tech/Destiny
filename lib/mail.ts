@@ -26,7 +26,8 @@ export class MailDeliveryError extends Error {
 
 async function saveMailPreview(mail: MailMessage): Promise<string> {
   const previewDir = process.env.MAIL_PREVIEW_DIR || '.mail-previews'
-  const filename = path.join(previewDir, `${mail.id}.html`)
+  const safeId = mail.id.replace(/[^a-zA-Z0-9_-]/g, '_')
+  const filename = path.join(previewDir, `${safeId}.html`)
   await fs.mkdir(previewDir, { recursive: true })
   await fs.writeFile(filename, mail.html, 'utf-8')
   return filename

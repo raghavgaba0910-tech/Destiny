@@ -6,12 +6,16 @@ import { z } from 'zod'
 
 const loginSchema = z.object({
   email: z.string().trim().min(1).max(254),
-  password: z.string().min(6),
+  password: z.string().min(6).max(72),
   expectedRole: z.enum(['PATIENT', 'COUNSELLOR', 'THERAPIST', 'PSYCHIATRIST', 'ADMIN']),
 })
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
-  session: { strategy: 'jwt' },
+  debug: false,
+  session: {
+    strategy: 'jwt',
+    maxAge: 24 * 60 * 60, // 24 hours max session age
+  },
   pages: {
     signIn: '/login',
   },

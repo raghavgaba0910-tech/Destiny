@@ -1,9 +1,6 @@
-import NextAuth from 'next-auth'
-import { authConfig } from './auth.config'
+import { auth } from './auth'
 import { NextResponse } from 'next/server'
 import { checkRateLimit, getClientIp, RATE_LIMITS } from '@/lib/rate-limit'
-
-const { auth } = NextAuth(authConfig)
 
 const PUBLIC_EXACT_PATHS = new Set([
   '/',

@@ -3,7 +3,6 @@ import Credentials from 'next-auth/providers/credentials'
 import { db } from '@/lib/db'
 import bcrypt from 'bcryptjs'
 import { z } from 'zod'
-import { authConfig } from './auth.config'
 
 const loginSchema = z.object({
   email: z.string().trim().min(1).max(254),
@@ -12,8 +11,14 @@ const loginSchema = z.object({
 })
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
-  ...authConfig,
   debug: false,
+  session: {
+    strategy: 'jwt',
+    maxAge: 24 * 60 * 60, // 24 hours max session age
+  },
+  pages: {
+    signIn: '/login',
+  },
   providers: [
     Credentials({
       async authorize(credentials) {
@@ -48,4 +53,22 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       },
     }),
   ],
+  callbacks: {
+    jwt({ token, user }) {
+      if (user) {
+        token.id = user.id
+        token.role = user.role
+        token.mustChangePassword = user.mustChangePassword
+      }
+      return token
+    },
+    session({ session, token }) {
+      if (token) {
+        session.user.id = token.id as string
+        session.user.role = token.role as string
+        session.user.mustChangePassword = token.mustChangePassword as boolean
+      }
+      return session
+    },
+  },
 })

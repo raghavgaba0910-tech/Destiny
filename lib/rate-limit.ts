@@ -20,9 +20,7 @@ if (typeof setInterval !== 'undefined') {
       }
     }
   }, 300_000)
-  if (typeof (interval as any)?.unref === 'function') {
-    (interval as any).unref()
-  }
+  if (interval.unref) interval.unref()
 }
 
 export type RateLimitConfig = {

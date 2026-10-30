@@ -20,7 +20,9 @@ if (typeof setInterval !== 'undefined') {
       }
     }
   }, 300_000)
-  if (interval.unref) interval.unref()
+  if (typeof (interval as any)?.unref === 'function') {
+    (interval as any).unref()
+  }
 }
 
 export type RateLimitConfig = {
@@ -96,7 +98,7 @@ export function getClientIp(request: Request): string {
  * Common preset rate limit configurations
  */
 export const RATE_LIMITS = {
-  AUTH: { windowMs: 60_000, maxRequests: 10 }, // 10 attempts per minute (login/register)
+  AUTH: { windowMs: 60_000, maxRequests: 25 }, // 25 attempts per minute (login/register)
   SUBMIT: { windowMs: 60_000, maxRequests: 20 }, // 20 requests per minute (forms, bookings, orders)
   GENERAL_API: { windowMs: 60_000, maxRequests: 120 }, // 120 requests per minute (standard API reads)
 }

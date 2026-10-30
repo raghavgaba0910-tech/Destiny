@@ -1,6 +1,9 @@
-import { auth } from './auth'
+import NextAuth from 'next-auth'
+import { authConfig } from './auth.config'
 import { NextResponse } from 'next/server'
 import { checkRateLimit, getClientIp, RATE_LIMITS } from '@/lib/rate-limit'
+
+const { auth } = NextAuth(authConfig)
 
 const PUBLIC_EXACT_PATHS = new Set([
   '/',
@@ -56,9 +59,11 @@ export default auth((req) => {
 
   // 3. Rate limiting for API endpoints
   if (pathname.startsWith('/api/')) {
-    const isAuthEndpoint = pathname.startsWith('/api/auth')
-    const limitConfig = isAuthEndpoint ? RATE_LIMITS.AUTH : RATE_LIMITS.GENERAL_API
-    const rateCheck = checkRateLimit(`${ip}:${isAuthEndpoint ? 'auth' : 'api'}`, limitConfig)
+    // Only sensitive auth mutating actions (login / register / credentials verification) use strict limits
+    // Read-only session checks like /api/auth/session use general API limits to prevent false 429s during navigation
+    const isSensitiveAuth = pathname.startsWith('/api/auth/callback') || pathname.startsWith('/api/auth/signin')
+    const limitConfig = isSensitiveAuth ? RATE_LIMITS.AUTH : RATE_LIMITS.GENERAL_API
+    const rateCheck = checkRateLimit(`${ip}:${isSensitiveAuth ? 'auth-action' : 'api'}`, limitConfig)
 
     if (!rateCheck.success) {
       return NextResponse.json(

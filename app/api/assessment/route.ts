@@ -16,7 +16,7 @@ const schema = z.object({
 export async function POST(request: Request) {
   const session = await auth()
   if (!session?.user?.id) return NextResponse.json({ error: 'Sign in required.' }, { status: 401 })
-  if (session.user.role !== 'PATIENT') return NextResponse.json({ error: 'Patient sign-in required.' }, { status: 403 })
+  if (session.user.role !== 'PATIENT') return NextResponse.json({ error: 'Client sign-in required.' }, { status: 403 })
 
   const ip = getClientIp(request)
   const rateLimit = checkRateLimit(`assessment:${session.user.id}:${ip}`, { windowMs: 10 * 60_000, maxRequests: 15 })

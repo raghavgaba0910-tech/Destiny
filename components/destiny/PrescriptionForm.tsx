@@ -33,7 +33,7 @@ export function PrescriptionForm({ appointments, medicines, canPrescribe }: { ap
     })
     const body = await response.json()
     setBusy(false)
-    setMessage(response.ok ? 'Care plan saved to the patient’s pharmacy profile.' : body.error || 'Could not save the care plan.')
+    setMessage(response.ok ? 'Care plan saved to the client’s pharmacy profile.' : body.error || 'Could not save the care plan.')
     if (response.ok) {
       setSelected([])
       setDetails({})
@@ -63,7 +63,7 @@ export function PrescriptionForm({ appointments, medicines, canPrescribe }: { ap
       </div>
     })}</div></fieldset>}
     <label className="block text-sm font-medium">Suggested next session<input type="date" min={new Date().toISOString().slice(0, 10)} value={nextSessionAt} onChange={(event) => setNextSessionAt(event.target.value)} className="mt-1 h-11 w-full rounded-xl border bg-white px-3" /></label>
-    <label className="flex items-center gap-2 text-sm"><input type="checkbox" checked={followUpRequired} onChange={(event) => setFollowUpRequired(event.target.checked)} />Patient should book a follow-up session</label>
+    <label className="flex items-center gap-2 text-sm"><input type="checkbox" checked={followUpRequired} onChange={(event) => setFollowUpRequired(event.target.checked)} />Client should book a follow-up session</label>
     <label className="block text-sm font-medium">Follow-up guidance<textarea value={followUpNotes} onChange={(event) => setFollowUpNotes(event.target.value)} maxLength={1000} rows={3} className="mt-1 w-full rounded-xl border p-3 text-sm" placeholder="Optional care instructions or follow-up notes" /></label>
     <button disabled={busy || !appointmentId || (canPrescribe && !selected.length && !followUpRequired && !followUpNotes.trim() && !nextSessionAt)} className="w-full rounded-xl bg-indigo px-4 py-3 font-semibold text-white disabled:opacity-50">{busy ? 'Saving…' : canPrescribe ? 'Save prescription and care note' : 'Save follow-up plan'}</button>
     {message && <p role="status" className="text-sm text-muted-foreground">{message}</p>}

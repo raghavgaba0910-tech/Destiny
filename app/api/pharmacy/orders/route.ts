@@ -17,7 +17,7 @@ const schema = z.object({
 export async function POST(request: Request) {
   const session = await auth()
   if (!session?.user?.id || session.user.role !== 'PATIENT') {
-    return NextResponse.json({ error: 'Patient sign-in required.' }, { status: 403 })
+    return NextResponse.json({ error: 'Client sign-in required.' }, { status: 403 })
   }
 
   // Rate limiting for order placements

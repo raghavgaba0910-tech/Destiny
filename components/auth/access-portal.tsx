@@ -7,19 +7,19 @@ type AccessPortalProps = {
 
 const portalContent = {
   patient: {
-    eyebrow: 'Patient portal',
+    eyebrow: 'Client portal',
     title: 'Your next step starts here.',
-    description: 'Sign in to return to your space, or create a patient account to save check-ins and revisit your care journey.',
+    description: 'Sign in to return to your space, or create a client account to save assessments and revisit your care journey.',
     icon: UserRound,
     actions: [
       {
-        title: 'Patient sign in',
-        description: 'Continue to your check-ins, appointments, and saved reports.',
+        title: 'Client sign in',
+        description: 'Continue to your assessments, appointments, and saved reports.',
         label: 'Sign in',
         href: '/login',
       },
       {
-        title: 'Create a patient account',
+        title: 'Create a client account',
         description: 'Get started with a free account and make this space your own.',
         label: 'Create account',
         href: '/register',

@@ -31,7 +31,7 @@ export default async function HelpdeskPage() {
     ...assessments.map((assessment) => ({ id: assessment.id, type: 'ASSESSMENT' as const, label: `Assessment report · ${assessmentTitles[assessment.type]} · ${new Date(assessment.createdAt).toLocaleDateString('en-IN')}` })),
   ]
   return <main className="mx-auto max-w-6xl px-5 py-10 md:px-8">
-    <p className="text-sm font-semibold uppercase tracking-[.18em] text-violet">{isPatient ? 'Patient support' : 'Professional support'}</p>
+    <p className="text-sm font-semibold uppercase tracking-[.18em] text-violet">{isPatient ? 'Client support' : 'Professional support'}</p>
     <h1 className="mt-3 text-3xl font-bold">Help desk</h1>
     <p className="mt-2 text-sm text-slate-500">File a request about your Destiny account or an activity.</p>
     <div className="mt-7"><SupportDesk

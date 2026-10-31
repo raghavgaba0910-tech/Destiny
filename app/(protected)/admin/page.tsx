@@ -34,7 +34,7 @@ export default async function AdminPage() {
   return <main className="mx-auto max-w-6xl px-5 py-10 md:px-8">
     <p className="text-sm font-semibold uppercase tracking-[.18em] text-violet">Destiny administration</p>
     <h1 className="mt-3 text-3xl font-bold">Admin workspace</h1>
-    <p className="mt-2 text-sm text-slate-500">Review provider applications and respond to patient and professional help desk requests.</p>
+    <p className="mt-2 text-sm text-slate-500">Review provider applications and respond to client and professional help desk requests.</p>
     <div className="mt-7"><AdminConsole applications={applications.map((application) => ({ ...application, createdAt: application.createdAt.toISOString() }))} tickets={ticketProps} /></div>
   </main>
 }

@@ -17,7 +17,7 @@ const schema = z.object({
 export async function POST(request: Request) {
   const session = await auth()
   if (!session?.user?.id || !['PATIENT', 'COUNSELLOR', 'THERAPIST', 'PSYCHIATRIST'].includes(session.user.role)) {
-    return NextResponse.json({ error: 'Patient or professional sign-in required.' }, { status: 403 })
+    return NextResponse.json({ error: 'Client or professional sign-in required.' }, { status: 403 })
   }
 
   // Rate limiting support requests

@@ -81,7 +81,7 @@ export default async function ProfessionalProfilePage({ params }: { params: Prom
         <aside className="lg:sticky lg:top-6">
           {session?.user?.role === 'PATIENT'
             ? <BookingSection professionalId={professional.id} professionalName={professional.user.name} patientName={session.user.name} hasAssessment={Boolean(latestAssessment)} pricePerSession={professional.pricePerSession} />
-            : <div className="rounded-2xl border border-slate-200 bg-white p-5 text-sm leading-6 text-slate-600">Appointments can be booked from a patient account.</div>}
+            : <div className="rounded-2xl border border-slate-200 bg-white p-5 text-sm leading-6 text-slate-600">Appointments can be booked from a client account.</div>}
           <p className="mt-3 text-center text-[10px] leading-4 text-slate-400">Session fee: ₹{priceFormat.format(professional.pricePerSession)}. Payment is not collected here.</p>
         </aside>
       </div>

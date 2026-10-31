@@ -25,7 +25,7 @@ function medicineRows(value: unknown): string {
 
 export async function GET(_request: Request, { params }: { params: Promise<{ id: string }> }) {
   const session = await auth()
-  if (!session?.user?.id || session.user.role !== 'PATIENT') return new Response('Patient sign-in required.', { status: 401 })
+  if (!session?.user?.id || session.user.role !== 'PATIENT') return new Response('Client sign-in required.', { status: 401 })
   const { id } = await params
   const prescription = await db.prescription.findFirst({
     where: { id, patientId: session.user.id },
@@ -48,8 +48,8 @@ export async function GET(_request: Request, { params }: { params: Promise<{ id:
 <title>Destiny prescription and care report</title>
 <style>body{font:16px Arial,sans-serif;max-width:760px;margin:40px auto;padding:0 20px;color:#17182a}table{width:100%;border-collapse:collapse;margin:24px 0}th,td{text-align:left;vertical-align:top;border-bottom:1px solid #ddd;padding:12px 4px}.muted{color:#666;line-height:1.6}.block{margin:24px 0;padding:16px;background:#f6f5f2;border-radius:12px}@media print{button{display:none}}</style>
 <h1>Destiny · Prescription and follow-up report</h1>
-<p class="muted">This record is for the patient and clinician named below. It is not a diagnosis or emergency service.</p>
-<h2>Patient</h2><p>${escapeHtml(prescription.appointment.patientName)}</p>
+<p class="muted">This record is for the client and clinician named below. It is not a diagnosis or emergency service.</p>
+<h2>Client</h2><p>${escapeHtml(prescription.appointment.patientName)}</p>
 <h2>${medicines ? 'Prescribing clinician' : 'Follow-up plan by'}</h2><p>${escapeHtml(prescription.appointment.professional.user.name)} · ${escapeHtml(role)} · Destiny ID ${escapeHtml(prescription.appointment.professional.professionalCode)}</p>
 <p class="muted">Issued ${escapeHtml(prescription.createdAt.toLocaleString('en-IN'))}</p>
 ${medicines ? `<h2>Medication schedule</h2><table><thead><tr><th>Medicine</th><th>Dose, frequency, duration</th></tr></thead><tbody>${medicines}</tbody></table>` : '<p class="block">No medication was prescribed. This report contains follow-up guidance only.</p>'}

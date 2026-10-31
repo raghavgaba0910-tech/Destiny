@@ -85,7 +85,7 @@ export default async function ProfessionalConsolePage() {
                       })}
                     </ol>
                   </details>
-                ) : <p className="mt-4 inline-flex items-center gap-2 text-xs text-slate-500"><UserRound className="h-4 w-4" /> Patient details only; no assessment report was shared.</p>}
+                ) : <p className="mt-4 inline-flex items-center gap-2 text-xs text-slate-500"><UserRound className="h-4 w-4" /> Client details only; no assessment report was shared.</p>}
               </article>
             )
           })}

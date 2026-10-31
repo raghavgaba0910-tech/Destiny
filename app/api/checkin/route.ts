@@ -18,7 +18,7 @@ function todayUtc() {
 export async function GET() {
   const session = await auth()
   if (!session?.user?.id) return NextResponse.json({ error: 'Sign in required.' }, { status: 401 })
-  if (session.user.role !== 'PATIENT') return NextResponse.json({ error: 'Patient sign-in required.' }, { status: 403 })
+  if (session.user.role !== 'PATIENT') return NextResponse.json({ error: 'Client sign-in required.' }, { status: 403 })
 
   const [completed, checkins] = await Promise.all([
     db.appointment.count({ where: { patientId: session.user.id, status: 'COMPLETED' } }),
@@ -29,7 +29,7 @@ export async function GET() {
 
 export async function POST(request: Request) {
   const session = await auth()
-  if (!session?.user?.id || session.user.role !== 'PATIENT') return NextResponse.json({ error: 'Patient sign-in required.' }, { status: 403 })
+  if (!session?.user?.id || session.user.role !== 'PATIENT') return NextResponse.json({ error: 'Client sign-in required.' }, { status: 403 })
   const completed = await db.appointment.count({ where: { patientId: session.user.id, status: 'COMPLETED' } })
   if (!completed) return NextResponse.json({ error: 'Complete your first session to unlock daily check-ins.' }, { status: 403 })
 

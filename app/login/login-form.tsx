@@ -135,7 +135,7 @@ export default function LoginForm({ professional, registered }: LoginFormProps) 
           <span className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/[.06] px-3 py-1.5 text-[10px] font-semibold uppercase tracking-[.15em] text-teal-100"><Heart className="h-3.5 w-3.5" /> Your space is here</span>
           <h1 className="mt-6 text-5xl font-semibold leading-[1.08] tracking-tight xl:text-6xl">Welcome back to <span className="text-teal">your pace.</span></h1>
           <p className="mt-5 max-w-md text-sm leading-7 text-white/60">Pick up where you left off. No rush to have everything figured out — just one small step at a time.</p>
-          <div className="mt-10 space-y-4">{['Your check-ins and care reports', 'Appointments and people you’ve explored', 'A private place to notice your progress'].map((text) => <p key={text} className="flex items-center gap-3 text-xs text-white/75"><span className="flex h-6 w-6 items-center justify-center rounded-full bg-teal/15 text-teal"><Check className="h-3.5 w-3.5" /></span>{text}</p>)}</div>
+          <div className="mt-10 space-y-4">{['Your assessments and care reports', 'Appointments and people you’ve explored', 'A private place to notice your progress'].map((text) => <p key={text} className="flex items-center gap-3 text-xs text-white/75"><span className="flex h-6 w-6 items-center justify-center rounded-full bg-teal/15 text-teal"><Check className="h-3.5 w-3.5" /></span>{text}</p>)}</div>
         </div>
         <p className="relative text-[10px] leading-5 text-white/40">Destiny is not a clinical or emergency service.</p>
       </section>
@@ -144,10 +144,10 @@ export default function LoginForm({ professional, registered }: LoginFormProps) 
         <div className="flex items-center justify-between lg:justify-end"><Link href="/for-patients" className="inline-flex items-center gap-1.5 text-xs font-medium text-slate-500 transition hover:text-indigo lg:hidden"><ArrowLeft className="h-3.5 w-3.5" /> Back</Link><span className="inline-flex items-center gap-1.5 text-[10px] text-slate-400"><LockKeyhole className="h-3.5 w-3.5" /> A private space</span></div>
         <div className="mx-auto flex w-full max-w-[430px] flex-1 flex-col justify-center py-12">
           <div className="mb-8 flex h-12 w-12 items-center justify-center rounded-2xl bg-violet/10 text-violet"><Sparkles className="h-5 w-5" /></div>
-          <p className="text-[10px] font-bold uppercase tracking-[.16em] text-violet">Patient portal</p>
-          <h2 className="mt-2 text-3xl font-semibold tracking-tight text-ink">Patient sign in</h2>
+          <p className="text-[10px] font-bold uppercase tracking-[.16em] text-violet">For Clients · Client Portal</p>
+          <h2 className="mt-2 text-3xl font-semibold tracking-tight text-ink">Client sign in</h2>
           <p className="mt-2 text-sm leading-6 text-slate-500">Sign in to continue your journey with Destiny.</p>
-          {registered && <p role="status" className="mt-5 rounded-xl border border-teal/20 bg-teal/[.06] px-3.5 py-3 text-xs leading-5 text-teal">Your patient account is ready. Sign in to continue.</p>}
+          {registered && <p role="status" className="mt-5 rounded-xl border border-teal/20 bg-teal/[.06] px-3.5 py-3 text-xs leading-5 text-teal">Your client account is ready. Sign in to continue.</p>}
           <form onSubmit={(event) => void handleSubmit(event)} className="mt-8 space-y-5">
             <div className="space-y-2"><Label htmlFor="email" className="text-xs font-semibold text-slate-700">Email address</Label><Input id="email" type="email" autoComplete="username" value={email} onChange={(event) => setEmail(event.target.value)} placeholder="you@example.com" className="h-12 rounded-xl border-slate-200 bg-white px-4 text-sm placeholder:text-slate-400 focus-visible:ring-violet/20" required /></div>
             <div className="space-y-2"><Label htmlFor="password" className="text-xs font-semibold text-slate-700">Password</Label><Input id="password" type="password" autoComplete="current-password" value={password} onChange={(event) => setPassword(event.target.value)} placeholder="Enter your password" className="h-12 rounded-xl border-slate-200 bg-white px-4 text-sm placeholder:text-slate-400 focus-visible:ring-violet/20" required /></div>
@@ -155,7 +155,7 @@ export default function LoginForm({ professional, registered }: LoginFormProps) 
             <Button type="submit" className="h-12 w-full rounded-xl bg-[#171a32] text-sm font-semibold text-white hover:bg-indigo" disabled={loading}>{loading ? 'Signing you in…' : <>Sign in <ArrowRight className="ml-2 h-4 w-4" /></>}</Button>
           </form>
           <div className="mt-6 flex items-start gap-2.5 rounded-xl border border-indigo/10 bg-indigo/[.035] p-3.5"><ShieldCheck className="mt-0.5 h-4 w-4 shrink-0 text-indigo" /><p className="text-[10px] leading-5 text-slate-500">Please don’t enter real or sensitive health information.</p></div>
-          <p className="mt-7 text-center text-xs text-slate-500">New to Destiny? <Link href="/register" className="font-semibold text-indigo hover:underline">Create your patient account</Link></p>
+          <p className="mt-7 text-center text-xs text-slate-500">New to Destiny? <Link href="/register" className="font-semibold text-indigo hover:underline">Create your client account</Link></p>
         </div>
         <p className="pb-2 text-center text-[10px] text-slate-400">If you need urgent support in India, call <a href="tel:112" className="font-semibold underline">112</a> · Tele-MANAS <a href="tel:14416" className="font-semibold underline">14416</a></p>
       </section>

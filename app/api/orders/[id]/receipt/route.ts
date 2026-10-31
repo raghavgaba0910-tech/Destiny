@@ -14,7 +14,7 @@ function escapeHtml(value: string): string {
 export async function GET(_request: Request, { params }: { params: Promise<{ id: string }> }) {
   const session = await auth()
   if (!session?.user?.id || session.user.role !== 'PATIENT') {
-    return new Response('Patient sign-in required.', { status: 401 })
+    return new Response('Client sign-in required.', { status: 401 })
   }
   const { id } = await params
   const order = await db.order.findFirst({ where: { id, userId: session.user.id } })

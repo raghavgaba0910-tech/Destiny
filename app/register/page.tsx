@@ -77,8 +77,8 @@ export default function RegisterPage() {
         <div className="relative max-w-xl py-16">
           <span className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/[.06] px-3 py-1.5 text-[10px] font-semibold uppercase tracking-[.15em] text-teal-100"><Heart className="h-3.5 w-3.5" /> A softer place to begin</span>
           <h1 className="mt-6 text-5xl font-semibold leading-[1.08] tracking-tight xl:text-6xl">A little space to <span className="text-teal">start again.</span></h1>
-          <p className="mt-5 max-w-md text-sm leading-7 text-white/60">Make an account to save your check-ins, revisit your care report, and explore next steps whenever it feels right.</p>
-          <div className="mt-9 grid grid-cols-2 gap-3">{[['01', 'Check in privately'], ['02', 'Understand your options'], ['03', 'Explore sample providers'], ['04', 'Go at your pace']].map(([number, text]) => <div key={number} className="rounded-2xl border border-white/10 bg-white/[.05] p-3"><span className="text-[9px] font-bold text-teal">{number}</span><p className="mt-1.5 text-[11px] font-medium text-white/75">{text}</p></div>)}</div>
+          <p className="mt-5 max-w-md text-sm leading-7 text-white/60">Make an account to save your assessments, revisit your care report, and explore next steps whenever it feels right.</p>
+          <div className="mt-9 grid grid-cols-2 gap-3">{[['01', 'Private assessment'], ['02', 'Understand your options'], ['03', 'Explore sample providers'], ['04', 'Go at your pace']].map(([number, text]) => <div key={number} className="rounded-2xl border border-white/10 bg-white/[.05] p-3"><span className="text-[9px] font-bold text-teal">{number}</span><p className="mt-1.5 text-[11px] font-medium text-white/75">{text}</p></div>)}</div>
         </div>
         <p className="relative text-[10px] leading-5 text-white/40">Not a clinical, pharmacy, or emergency service.</p>
       </section>

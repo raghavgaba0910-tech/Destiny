@@ -38,7 +38,7 @@ export async function GET() {
 
 export async function POST(request: Request) {
   const session = await auth()
-  if (!session?.user?.id || session.user.role !== 'PATIENT') return NextResponse.json({ error: 'Patient sign-in required.' }, { status: 403 })
+  if (!session?.user?.id || session.user.role !== 'PATIENT') return NextResponse.json({ error: 'Client sign-in required.' }, { status: 403 })
 
   // Rate limiting to prevent slot reservation exhaustion
   const ip = getClientIp(request)
@@ -61,7 +61,7 @@ export async function POST(request: Request) {
 
   const cleanPatientName = sanitizeText(parsed.data.patientName, 100)
   if (cleanPatientName.length < 2) {
-    return NextResponse.json({ error: 'Please enter a valid patient name.' }, { status: 400 })
+    return NextResponse.json({ error: 'Please enter a valid client name.' }, { status: 400 })
   }
 
   try {

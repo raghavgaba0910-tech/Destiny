@@ -141,7 +141,7 @@ export function AdminConsole({ applications, tickets }: { applications: Applicat
       </div>
     </section>
     <section className="rounded-3xl border bg-white p-5 sm:p-6">
-      <div className="flex flex-wrap items-end justify-between gap-3"><div><h2 className="text-xl font-bold">Help desk</h2><p className="mt-1 text-sm text-slate-500">Patient and professional questions are collected here.</p></div><span className="rounded-full bg-violet/10 px-3 py-1 text-xs font-semibold text-violet">{tickets.length} ticket(s)</span></div>
+      <div className="flex flex-wrap items-end justify-between gap-3"><div><h2 className="text-xl font-bold">Help desk</h2><p className="mt-1 text-sm text-slate-500">Client and professional questions are collected here.</p></div><span className="rounded-full bg-violet/10 px-3 py-1 text-xs font-semibold text-violet">{tickets.length} ticket(s)</span></div>
       <div className="mt-5 space-y-4">
         {tickets.map((ticket) => <article key={ticket.id} className="rounded-2xl border p-4">
           <div className="flex flex-wrap justify-between gap-2"><div><p className="text-xs font-semibold uppercase tracking-wide text-violet">{categoryLabels[ticket.category] ?? ticket.category.replaceAll('_', ' ')}</p><h3 className="mt-1 font-semibold">{ticket.subject}</h3></div><span className="text-xs text-slate-500">{ticket.status.replaceAll('_', ' ')}</span></div>

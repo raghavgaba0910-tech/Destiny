@@ -106,7 +106,7 @@ export function SupportDesk({
   return <div className="space-y-6">
     <div className="grid gap-4 sm:grid-cols-2">
       <section className="rounded-2xl border border-[#294f7a] bg-[#4f80b8] p-5 text-white">
-        <h2 className="text-lg font-bold">{professional ? 'Professional help desk' : 'Patient help desk'}</h2>
+        <h2 className="text-lg font-bold">{professional ? 'Professional help desk' : 'Client help desk'}</h2>
         <p className="mt-2 text-sm leading-6">Select the issue that best matches your question. You can attach a session or pharmacy activity so the admin team knows what you’re asking about.</p>
         <p className="mt-3 text-sm font-semibold">Your issue will be resolved as soon as possible.</p>
       </section>

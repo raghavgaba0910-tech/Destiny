@@ -30,10 +30,10 @@ export default async function HelpdeskPage() {
     ...orders.map((order) => ({ id: order.id, type: 'ORDER' as const, label: `Pharmacy order · ${order.status.toLowerCase()} · ${new Date(order.createdAt).toLocaleDateString('en-IN')}` })),
     ...assessments.map((assessment) => ({ id: assessment.id, type: 'ASSESSMENT' as const, label: `Assessment report · ${assessmentTitles[assessment.type]} · ${new Date(assessment.createdAt).toLocaleDateString('en-IN')}` })),
   ]
-  return <main className="mx-auto max-w-6xl px-5 py-10 md:px-8">
-    <p className="text-sm font-semibold uppercase tracking-[.18em] text-violet">{isPatient ? 'Client support' : 'Professional support'}</p>
-    <h1 className="mt-3 text-3xl font-bold">Help desk</h1>
-    <p className="mt-2 text-sm text-slate-500">File a request about your Destiny account or an activity.</p>
+  return <main className="mx-auto max-w-6xl px-5 py-10 md:px-8 text-[#221C35]">
+    <p className="text-sm font-semibold uppercase tracking-[.18em] text-[#766F8C]">{isPatient ? 'Client support' : 'Professional support'}</p>
+    <h1 className="mt-3 text-3xl font-bold text-[#221C35]">Help desk</h1>
+    <p className="mt-2 text-sm text-[#554E6B]">File a request about your Destiny account or an activity.</p>
     <div className="mt-7"><SupportDesk
       professional={!isPatient}
       activities={activities}

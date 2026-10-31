@@ -211,7 +211,7 @@ export async function sendAssessmentConfirmation(assessment: {
 <head><meta charset="utf-8"><title>Assessment completed — Destiny</title></head>
 <body style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 40px 20px; background: #fbfaf8; color: #17182a;">
   <h1>Destiny</h1>
-  <h2>Hello ${escapeHtml(assessment.patientName)}, your check-in is complete.</h2>
+  <h2>Hello ${escapeHtml(assessment.patientName)}, your assessment is complete.</h2>
   <p>Your ${escapeHtml(assessment.title)} report is ready in your private Destiny account.</p>
   <p><a href="${escapeHtml(resultUrl)}">View your care report</a></p>
   <p style="color: #6B7280; font-size: 13px;">Screening is not a diagnosis and does not replace professional or emergency care. In crisis, call Tele-MANAS at 14416 or emergency services at 112.</p>
@@ -221,7 +221,7 @@ export async function sendAssessmentConfirmation(assessment: {
   return sendMailOrCreatePreview({
     id: `assessment-${assessment.id}`,
     to: assessment.to,
-    subject: 'Your Destiny check-in report is ready',
+    subject: 'Your Destiny assessment report is ready',
     html,
   })
 }

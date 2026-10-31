@@ -1,149 +1,537 @@
 import Link from 'next/link'
 import { auth } from '@/auth'
-import { ArrowRight, ArrowUpRight, AudioLines, Brain, Check, ChevronDown, CircleHelp, Clock3, Compass, Heart, HeartHandshake, LockKeyhole, MessageCircleHeart, ShieldCheck, Sparkles, Stethoscope } from 'lucide-react'
+import {
+  ArrowRight,
+  Brain,
+  Check,
+  ChevronDown,
+  Clock3,
+  Heart,
+  HeartHandshake,
+  LockKeyhole,
+  MessageCircleHeart,
+  PhoneCall,
+  ShieldCheck,
+  Sparkles,
+  Stethoscope,
+  Users,
+} from 'lucide-react'
+import { PublicHeader } from '@/components/layout/PublicHeader'
+import { HomeInteractiveCare } from '@/components/destiny/HomeInteractiveCare'
 
 const faqs = [
-  ['Is Destiny therapy?', 'No. Destiny helps you explore possible next steps. It cannot diagnose, treat, or replace a qualified clinician.'],
-  ['Are the check-ins free?', 'Yes. The check-in flows and care reports are available without charge.'],
-  ['Are the professionals real?', 'Provider profiles and appointment availability are illustrative and have not been independently verified.'],
-  ['What happens to my information?', 'Information is stored in this app’s configured database. Please do not enter real or sensitive health details.'],
-  ['Can I get help in an emergency?', 'If you are in immediate danger in India, call emergency services on 112. Tele-MANAS support is available at 14416.'],
-]
-
-const moods = [
-  { emoji: '◎', text: 'A little anxious', tone: 'text-indigo' },
-  { emoji: '☁', text: 'Feeling low', tone: 'text-violet' },
-  { emoji: '✳', text: 'Running on empty', tone: 'text-teal' },
-  { emoji: '↗', text: 'Not sure yet', tone: 'text-rose-500' },
+  {
+    q: 'Is Destiny online therapy or emergency care?',
+    a: 'Destiny is an exploration and support platform designed to make mental wellbeing approachable. It helps you reflect on your feelings, understand your options, and schedule sessions with professionals. Destiny is not a replacement for emergency clinical care. In an emergency in India, call 112 or Tele-MANAS at 14416.',
+  },
+  {
+    q: 'Are the self-assessments free to take?',
+    a: 'Yes. All self-reflection assessments (for mood, anxiety, stress, and lifestyle) and their accompanying care reports are completely free and can be taken at your own pace.',
+  },
+  {
+    q: 'How does Destiny protect my privacy?',
+    a: 'Your self-reflections are stored securely on your account. Sessions do not record video or audio transcripts. You have full control over whether your assessment report is shared with a professional prior to a session.',
+  },
+  {
+    q: 'What is the difference between a counsellor, therapist, and psychiatrist?',
+    a: 'A counsellor provides empathetic guidance for life transitions, relationships, and everyday stress. A therapist provides structured, evidence-based coping tools to change behavioral or thought patterns. A psychiatrist is a medical doctor who can provide clinical evaluations and medication management.',
+  },
+  {
+    q: 'How does appointment booking work?',
+    a: 'You can explore verified sample clinician profiles, review their specialties, languages, and session fees, and select an available weekday slot that fits your schedule.',
+  },
 ]
 
 export default async function HomePage() {
   const session = await auth()
-  const homeHref = session?.user?.role === 'ADMIN' ? '/admin' : session?.user?.role === 'PATIENT' ? '/dashboard' : '/pro'
-  const startHref = session?.user ? homeHref : '/register'
+  const homeHref =
+    session?.user?.role === 'ADMIN'
+      ? '/admin'
+      : session?.user?.role === 'PATIENT'
+      ? '/dashboard'
+      : '/pro'
+  const isLoggedIn = !!session?.user
+  const startHref = isLoggedIn ? homeHref : '/for-patients'
 
   return (
-    <main className="overflow-hidden bg-[#fbfaf8] text-[#17182a]">
-      <header className="sticky top-0 z-40 border-b border-slate-200/70 bg-[#fbfaf8]/90 backdrop-blur-xl">
-        <nav className="mx-auto flex h-[4.5rem] max-w-7xl items-center justify-between px-5 md:px-8">
-          <Link href="/" className="flex items-center gap-2.5" aria-label="Destiny home">
-            <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#171a32] text-white shadow-sm"><Sparkles className="h-[18px] w-[18px] text-teal" /></span>
-            <span className="text-lg font-semibold tracking-tight">Destiny<span className="text-violet">.</span></span>
-          </Link>
-          <div className="hidden items-center gap-8 text-[13px] font-medium text-slate-600 md:flex">
-            <a href="#how-it-works" className="transition hover:text-violet">How it works</a>
-            <a href="#care" className="transition hover:text-violet">Find support</a>
-            <a href="#faq" className="transition hover:text-violet">FAQs</a>
-          </div>
-          <div className="flex items-center gap-2">
-            <Link href="/professional-register" className="inline-flex min-h-10 items-center justify-center rounded-xl border border-slate-200 bg-white px-3 text-[10px] font-semibold text-slate-700 shadow-sm transition hover:border-violet/30 hover:bg-slate-50 sm:px-4 sm:text-xs">For professionals</Link>
-            <Link href="/for-patients" className="inline-flex min-h-10 items-center justify-center rounded-xl bg-[#171a32] px-3 text-[10px] font-semibold text-white shadow-sm transition hover:bg-indigo sm:px-4 sm:text-xs">For patients</Link>
-            {session?.user && <Link href={homeHref} className="inline-flex min-h-10 items-center gap-2 rounded-xl bg-[#171a32] px-4 text-xs font-semibold text-white transition hover:bg-indigo">My space <ArrowRight className="h-3.5 w-3.5" /></Link>}
-          </div>
-        </nav>
-      </header>
+    <div className="min-h-screen bg-[#FAF9F6] text-slate-900">
+      {/* Header */}
+      <PublicHeader isLoggedIn={isLoggedIn} homeHref={homeHref} />
 
-      <section className="relative isolate">
-        <div aria-hidden="true" className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(ellipse_at_76%_30%,rgba(119,101,221,.13),transparent_38%),radial-gradient(ellipse_at_8%_86%,rgba(32,174,157,.08),transparent_32%)]" />
-        <div className="mx-auto grid min-h-[650px] max-w-7xl items-center gap-10 px-5 py-12 md:px-8 md:py-16 lg:grid-cols-[1.02fr_.98fr] lg:gap-8">
-          <div className="max-w-2xl pb-3">
-            <div className="inline-flex items-center gap-2 rounded-full border border-violet/15 bg-white/80 px-3.5 py-2 text-[10px] font-semibold uppercase tracking-[.15em] text-violet shadow-sm"><span className="h-1.5 w-1.5 rounded-full bg-teal" /> A softer start to feeling better</div>
-            <h1 className="mt-7 max-w-[680px] text-[2.7rem] font-semibold leading-[1.08] tracking-[-.045em] text-[#17182a] sm:text-6xl lg:text-[4.25rem]">You don’t have to have it <span className="bg-gradient-to-r from-violet via-indigo to-teal bg-clip-text text-transparent">all figured out.</span></h1>
-            <p className="mt-6 max-w-xl text-base leading-7 text-slate-600 sm:text-lg sm:leading-8">Start with how you’re feeling. Find a small, clear next step toward support that feels right for you.</p>
-            <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-              <Link href={startHref} className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl bg-[#171a32] px-5 text-sm font-semibold text-white shadow-[0_12px_25px_-14px_rgba(40,40,90,.65)] transition hover:-translate-y-0.5 hover:bg-indigo">Start a free check-in <ArrowRight className="h-4 w-4" /></Link>
-              <Link href={session?.user ? '/therapists' : '/login'} className="inline-flex min-h-12 items-center justify-center rounded-xl border border-slate-200 bg-white/80 px-5 text-sm font-semibold text-slate-700 transition hover:border-violet/30 hover:bg-white">{session?.user ? 'Explore professionals' : 'I already have an account'}</Link>
+      {/* Immediate Helpline Notice */}
+      <aside aria-label="Crisis helpline notice" className="border-b border-rose-100 bg-rose-50/80 px-4 py-2.5 text-center text-xs text-rose-950">
+        <span className="font-semibold">Need urgent support in India?</span> Call emergency{' '}
+        <a href="tel:112" className="font-bold underline">
+          112
+        </a>{' '}
+        or Tele-MANAS at{' '}
+        <a href="tel:14416" className="font-bold underline">
+          14416
+        </a>{' '}
+        (Toll-Free, 24/7). You are never alone.
+      </aside>
+
+      {/* Hero Section */}
+      <section className="relative overflow-hidden py-12 md:py-20 lg:py-24">
+        {/* Soothing background auras */}
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute left-1/2 top-0 -z-10 h-[600px] w-full -translate-x-1/2 bg-[radial-gradient(ellipse_at_top,rgba(99,102,241,0.08)_0%,rgba(20,184,166,0.06)_40%,transparent_70%)]"
+        />
+
+        <div className="mx-auto max-w-7xl px-5 sm:px-8">
+          <div className="grid items-center gap-12 lg:grid-cols-[1.1fr_1fr] lg:gap-16">
+            {/* Left Column: Reassuring Hero Pitch */}
+            <div className="max-w-2xl">
+              <div className="inline-flex items-center gap-2 rounded-full border border-indigo-200/80 bg-white/90 px-4 py-1.5 text-xs font-semibold text-indigo-700 shadow-sm">
+                <span className="h-2 w-2 rounded-full bg-teal-500 animate-pulse" />
+                A softer, clearer start to feeling better
+              </div>
+
+              <h1 className="mt-6 text-4xl font-extrabold tracking-tight text-slate-900 sm:text-5xl lg:text-6xl lg:leading-[1.15]">
+                You don’t have to carry it{' '}
+                <span className="bg-gradient-to-r from-indigo-600 via-violet-600 to-teal-600 bg-clip-text text-transparent">
+                  all figured out.
+                </span>
+              </h1>
+
+              <p className="mt-6 text-base leading-relaxed text-slate-600 sm:text-lg sm:leading-8">
+                A calm, private space designed for young adults. Start with how you’re feeling
+                today — get a human-language care report, gentle daily routines, and connect with
+                licensed professionals at your own pace.
+              </p>
+
+              {/* Primary Actions */}
+              <div className="mt-8 flex flex-col gap-3.5 sm:flex-row sm:items-center">
+                <Link
+                  href={startHref}
+                  className="inline-flex h-13 items-center justify-center gap-2.5 rounded-2xl bg-slate-900 px-6 text-sm font-bold text-white shadow-lg shadow-slate-900/15 transition hover:-translate-y-0.5 hover:bg-indigo-600"
+                >
+                  Take a Free Assessment
+                  <ArrowRight className="h-4 w-4" />
+                </Link>
+
+                <Link
+                  href={isLoggedIn ? '/therapists' : '/for-patients'}
+                  className="inline-flex h-13 items-center justify-center rounded-2xl border border-slate-200 bg-white/90 px-6 text-sm font-semibold text-slate-700 shadow-sm transition hover:border-indigo-300 hover:bg-white"
+                >
+                  Explore Support Providers
+                </Link>
+              </div>
+
+              {/* Trust Indicators */}
+              <div className="mt-10 flex flex-wrap items-center gap-x-6 gap-y-3 border-t border-slate-200/80 pt-6 text-xs text-slate-500">
+                <span className="inline-flex items-center gap-2">
+                  <LockKeyhole className="h-4 w-4 text-teal-600" /> 100% Private reflection
+                </span>
+                <span className="inline-flex items-center gap-2">
+                  <Clock3 className="h-4 w-4 text-indigo-600" /> Takes under 5 minutes
+                </span>
+                <span className="inline-flex items-center gap-2">
+                  <Heart className="h-4 w-4 text-rose-500" /> No pressure or judgment
+                </span>
+              </div>
             </div>
-            <div className="mt-8 flex flex-wrap items-center gap-x-5 gap-y-3 text-[11px] text-slate-500">
-              <span className="inline-flex items-center gap-1.5"><LockKeyhole className="h-3.5 w-3.5 text-teal" />Private reflection</span>
-              <span className="inline-flex items-center gap-1.5"><Clock3 className="h-3.5 w-3.5 text-violet" />About 5 minutes</span>
-              <span className="inline-flex items-center gap-1.5"><Heart className="h-3.5 w-3.5 text-rose-400" />No pressure, no judgement</span>
+
+            {/* Right Column: Interactive Mood & Care Selector */}
+            <div className="w-full">
+              <HomeInteractiveCare isLoggedIn={isLoggedIn} />
             </div>
           </div>
+        </div>
+      </section>
 
-          <div className="relative mx-auto w-full max-w-[550px] lg:ml-auto">
-            <div aria-hidden="true" className="absolute -left-7 top-[18%] h-48 w-48 rounded-full bg-violet/20 blur-[75px]" />
-            <div aria-hidden="true" className="absolute -right-3 bottom-[8%] h-48 w-48 rounded-full bg-teal/20 blur-[75px]" />
-            <div className="relative rounded-[2rem] border border-white/80 bg-gradient-to-br from-violet/70 via-indigo/50 to-teal/50 p-[1px] shadow-[0_35px_90px_-45px_rgba(55,48,110,.5)]">
-              <div className="overflow-hidden rounded-[1.95rem] bg-white/95 p-5 sm:p-7">
-                <div className="flex items-center justify-between border-b border-slate-100 pb-4">
-                  <div className="flex items-center gap-2.5"><span className="flex h-9 w-9 items-center justify-center rounded-xl bg-violet/10 text-violet"><MessageCircleHeart className="h-4 w-4" /></span><div><p className="text-xs font-semibold text-ink">A moment for you</p><p className="mt-0.5 text-[10px] text-slate-400">Start wherever you are</p></div></div>
-                  <span className="rounded-full bg-teal/10 px-2.5 py-1 text-[9px] font-bold uppercase tracking-[.12em] text-teal">Your space</span>
+      {/* 3 Step Path Forward Section */}
+      <section id="how-it-works" className="border-t border-slate-200/80 bg-white py-20 md:py-24">
+        <div className="mx-auto max-w-7xl px-5 sm:px-8">
+          <div className="max-w-2xl">
+            <span className="text-xs font-bold uppercase tracking-wider text-indigo-600">
+              A clear, predictable journey
+            </span>
+            <h2 className="mt-3 text-3xl font-extrabold tracking-tight text-slate-900 sm:text-4xl">
+              One gentle step at a time.
+            </h2>
+            <p className="mt-4 text-base leading-relaxed text-slate-600">
+              Navigating mental health can feel confusing. We made the steps straightforward,
+              accessible, and always in your control.
+            </p>
+          </div>
+
+          <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {/* Step 1 */}
+            <div className="group rounded-3xl border border-slate-200/90 bg-[#FAF9F6] p-7 transition duration-300 hover:-translate-y-1 hover:border-indigo-300 hover:bg-white hover:shadow-xl hover:shadow-indigo-950/5">
+              <div className="flex items-center justify-between">
+                <span className="flex h-12 w-12 items-center justify-center rounded-2xl bg-indigo-100 text-indigo-700">
+                  <Brain className="h-6 w-6" />
+                </span>
+                <span className="text-sm font-bold text-slate-400">01</span>
+              </div>
+              <h3 className="mt-6 text-xl font-bold text-slate-900">1. Clinical Assessment</h3>
+              <p className="mt-3 text-sm leading-relaxed text-slate-600">
+                Answer a few short, guided questions tailored to what you are experiencing — whether
+                it’s mood, anxiety, or stress. No time limits, no judgment.
+              </p>
+              <div className="mt-6 flex items-center gap-2 text-xs font-semibold text-indigo-600">
+                <Check className="h-4 w-4" /> Based on clinically recognized screening
+              </div>
+            </div>
+
+            {/* Step 2 */}
+            <div className="group rounded-3xl border border-slate-200/90 bg-[#FAF9F6] p-7 transition duration-300 hover:-translate-y-1 hover:border-violet-300 hover:bg-white hover:shadow-xl hover:shadow-violet-950/5">
+              <div className="flex items-center justify-between">
+                <span className="flex h-12 w-12 items-center justify-center rounded-2xl bg-violet-100 text-violet-700">
+                  <Sparkles className="h-6 w-6" />
+                </span>
+                <span className="text-sm font-bold text-slate-400">02</span>
+              </div>
+              <h3 className="mt-6 text-xl font-bold text-slate-900">2. Clear Care Report</h3>
+              <p className="mt-3 text-sm leading-relaxed text-slate-600">
+                Receive an immediate summary written in plain, human language. See what patterns
+                might be affecting you and what kind of support is recommended.
+              </p>
+              <div className="mt-6 flex items-center gap-2 text-xs font-semibold text-violet-600">
+                <Check className="h-4 w-4" /> Downloadable and easy to review
+              </div>
+            </div>
+
+            {/* Step 3 */}
+            <div className="group rounded-3xl border border-slate-200/90 bg-[#FAF9F6] p-7 transition duration-300 hover:-translate-y-1 hover:border-teal-300 hover:bg-white hover:shadow-xl hover:shadow-teal-950/5">
+              <div className="flex items-center justify-between">
+                <span className="flex h-12 w-12 items-center justify-center rounded-2xl bg-teal-100 text-teal-700">
+                  <HeartHandshake className="h-6 w-6" />
+                </span>
+                <span className="text-sm font-bold text-slate-400">03</span>
+              </div>
+              <h3 className="mt-6 text-xl font-bold text-slate-900">3. Connect When Ready</h3>
+              <p className="mt-3 text-sm leading-relaxed text-slate-600">
+                If and when you want to speak with someone, browse accredited counsellors,
+                therapists, or psychiatrists. Choose someone whose style fits your needs.
+              </p>
+              <div className="mt-6 flex items-center gap-2 text-xs font-semibold text-teal-600">
+                <Check className="h-4 w-4" /> Transparent pricing &amp; verified profiles
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Who Might I Talk To Section */}
+      <section id="care-options" className="py-20 md:py-24">
+        <div className="mx-auto max-w-7xl px-5 sm:px-8">
+          <div className="max-w-2xl">
+            <span className="text-xs font-bold uppercase tracking-wider text-teal-600">
+              Understanding your options
+            </span>
+            <h2 className="mt-3 text-3xl font-extrabold tracking-tight text-slate-900 sm:text-4xl">
+              Who might you talk to?
+            </h2>
+            <p className="mt-4 text-base leading-relaxed text-slate-600">
+              There is no single path for everyone. Here is an easy-to-understand breakdown of the
+              different mental health professionals available on Destiny.
+            </p>
+          </div>
+
+          <div className="mt-12 grid gap-6 md:grid-cols-3">
+            {/* Counsellor Card */}
+            <article className="flex flex-col rounded-3xl border border-slate-200/90 bg-white p-7 shadow-sm transition hover:border-teal-300 hover:shadow-md">
+              <span className="flex h-12 w-12 items-center justify-center rounded-2xl bg-teal-50 text-teal-600">
+                <MessageCircleHeart className="h-6 w-6" />
+              </span>
+              <p className="mt-5 text-xs font-bold uppercase tracking-wider text-teal-600">
+                Talk it through
+              </p>
+              <h3 className="mt-1 text-2xl font-bold text-slate-900">Counsellor</h3>
+              <p className="mt-3 flex-1 text-sm leading-relaxed text-slate-600">
+                A warm, compassionate sounding board. Ideal for navigating relationship challenges,
+                career stress, family expectations, and everyday emotional crossroads.
+              </p>
+              <div className="my-6 border-t border-slate-100 pt-4 text-xs text-slate-500">
+                <p className="font-semibold text-slate-700">Best suited for:</p>
+                <p className="mt-1">Everyday stress · Burnout · Life transitions</p>
+              </div>
+              <Link
+                href={isLoggedIn ? '/counsellors' : '/counsellors'}
+                className="inline-flex items-center gap-2 text-sm font-bold text-teal-700 transition hover:text-teal-900"
+              >
+                Explore Counsellors <ArrowRight className="h-4 w-4" />
+              </Link>
+            </article>
+
+            {/* Therapist Card */}
+            <article className="flex flex-col rounded-3xl border border-slate-200/90 bg-white p-7 shadow-sm transition hover:border-violet-300 hover:shadow-md">
+              <span className="flex h-12 w-12 items-center justify-center rounded-2xl bg-violet-50 text-violet-600">
+                <HeartHandshake className="h-6 w-6" />
+              </span>
+              <p className="mt-5 text-xs font-bold uppercase tracking-wider text-violet-600">
+                Build new tools
+              </p>
+              <h3 className="mt-1 text-2xl font-bold text-slate-900">Therapist</h3>
+              <p className="mt-3 flex-1 text-sm leading-relaxed text-slate-600">
+                Structured conversations using proven methodologies (such as CBT or mindfulness).
+                Helps you understand deep-seated patterns, manage recurring anxiety, and develop lasting coping mechanisms.
+              </p>
+              <div className="my-6 border-t border-slate-100 pt-4 text-xs text-slate-500">
+                <p className="font-semibold text-slate-700">Best suited for:</p>
+                <p className="mt-1">Recurring anxiety · Low mood · Behavioral habits</p>
+              </div>
+              <Link
+                href={isLoggedIn ? '/therapists' : '/therapists'}
+                className="inline-flex items-center gap-2 text-sm font-bold text-violet-700 transition hover:text-violet-900"
+              >
+                Explore Therapists <ArrowRight className="h-4 w-4" />
+              </Link>
+            </article>
+
+            {/* Psychiatrist Card */}
+            <article className="flex flex-col rounded-3xl border border-slate-200/90 bg-white p-7 shadow-sm transition hover:border-indigo-300 hover:shadow-md">
+              <span className="flex h-12 w-12 items-center justify-center rounded-2xl bg-indigo-50 text-indigo-600">
+                <Stethoscope className="h-6 w-6" />
+              </span>
+              <p className="mt-5 text-xs font-bold uppercase tracking-wider text-indigo-600">
+                Medical perspective
+              </p>
+              <h3 className="mt-1 text-2xl font-bold text-slate-900">Psychiatrist</h3>
+              <p className="mt-3 flex-1 text-sm leading-relaxed text-slate-600">
+                A licensed medical doctor specializing in mental health. They can evaluate clinical
+                symptoms, discuss physiological factors, and provide clinical diagnosis or medication guidance when appropriate.
+              </p>
+              <div className="my-6 border-t border-slate-100 pt-4 text-xs text-slate-500">
+                <p className="font-semibold text-slate-700">Best suited for:</p>
+                <p className="mt-1">Clinical assessments · Medical care plans · Complex symptoms</p>
+              </div>
+              <Link
+                href={isLoggedIn ? '/therapists' : '/therapists'}
+                className="inline-flex items-center gap-2 text-sm font-bold text-indigo-700 transition hover:text-indigo-900"
+              >
+                Explore Psychiatrists <ArrowRight className="h-4 w-4" />
+              </Link>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      {/* Clinical Self-Assessments Feature Grid */}
+      <section id="assessments" className="border-t border-slate-200/80 bg-white py-20 md:py-24">
+        <div className="mx-auto max-w-7xl px-5 sm:px-8">
+          <div className="flex flex-col justify-between gap-6 sm:flex-row sm:items-end">
+            <div className="max-w-2xl">
+              <span className="text-xs font-bold uppercase tracking-wider text-indigo-600">
+                Private &amp; self-paced
+              </span>
+              <h2 className="mt-3 text-3xl font-extrabold tracking-tight text-slate-900 sm:text-4xl">
+                Clinical Self-Assessments
+              </h2>
+              <p className="mt-3 text-base text-slate-600">
+                Select an area for your self-assessment. Takes 3–5 minutes.
+              </p>
+            </div>
+            <Link
+              href={startHref}
+              className="inline-flex h-11 items-center gap-2 rounded-xl bg-slate-900 px-5 text-xs font-bold text-white transition hover:bg-indigo-600"
+            >
+              Explore All Assessments <ArrowRight className="h-3.5 w-3.5" />
+            </Link>
+          </div>
+
+          <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+            {[
+              {
+                title: 'Low Mood & Energy',
+                desc: 'Reflect on energy levels, sleep patterns, and pleasure in everyday activities.',
+                time: '4 mins',
+                type: 'depression',
+                badge: 'PHQ-9 screening',
+              },
+              {
+                title: 'Anxiety & Worry',
+                desc: 'Assess restlessness, racing thoughts, and feelings of nervousness or panic.',
+                time: '3 mins',
+                type: 'anxiety',
+                badge: 'GAD-7 screening',
+              },
+              {
+                title: 'Stress & Burnout',
+                desc: 'Understand academic, workplace, or relationship pressures and recovery capacity.',
+                time: '5 mins',
+                type: 'stress',
+                badge: 'Stress index',
+              },
+              {
+                title: 'Habit & Substance Use',
+                desc: 'Evaluate habits, alcohol, or substance reliance with compassionate objectivity.',
+                time: '3 mins',
+                type: 'substance',
+                badge: 'Awareness reflection',
+              },
+            ].map((item) => (
+              <div
+                key={item.title}
+                className="flex flex-col justify-between rounded-3xl border border-slate-200/80 bg-[#FAF9F6] p-6 transition hover:border-indigo-300 hover:bg-white hover:shadow-md"
+              >
+                <div>
+                  <div className="flex items-center justify-between text-xs text-slate-500">
+                    <span className="rounded-full bg-white px-2.5 py-1 font-semibold text-slate-700 shadow-sm">
+                      {item.badge}
+                    </span>
+                    <span>{item.time}</span>
+                  </div>
+                  <h3 className="mt-4 text-lg font-bold text-slate-900">{item.title}</h3>
+                  <p className="mt-2 text-xs leading-relaxed text-slate-600">{item.desc}</p>
                 </div>
-                <p className="mt-6 text-[10px] font-semibold uppercase tracking-[.14em] text-slate-400">How are things feeling lately?</p>
-                <div className="mt-3 grid grid-cols-2 gap-2.5">
-                  {moods.map((mood, index) => <Link key={mood.text} href={startHref} className="group flex min-h-[4.2rem] items-center gap-3 rounded-2xl border border-slate-100 bg-[#fbfaf8] px-3.5 transition hover:border-violet/25 hover:bg-violet/[.035]"><span className={`flex h-9 w-9 items-center justify-center rounded-xl bg-white text-xl shadow-sm ${mood.tone}`}>{mood.emoji}</span><span className="text-xs font-medium text-slate-700">{mood.text}</span><ArrowUpRight className="ml-auto h-3.5 w-3.5 text-slate-300 transition group-hover:text-violet" /></Link>)}
+                <Link
+                  href={isLoggedIn ? `/assessment/${item.type}` : '/for-patients'}
+                  className="mt-6 inline-flex items-center gap-1.5 text-xs font-bold text-indigo-600 hover:text-indigo-800"
+                >
+                  Start Assessment <ArrowRight className="h-3.5 w-3.5" />
+                </Link>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Safety & Peace of Mind Banner */}
+      <section className="py-16 md:py-20">
+        <div className="mx-auto max-w-7xl px-5 sm:px-8">
+          <div className="relative overflow-hidden rounded-3xl bg-slate-900 px-7 py-12 text-white shadow-xl sm:px-12 sm:py-16">
+            <div
+              aria-hidden="true"
+              className="pointer-events-none absolute -right-20 -top-20 h-80 w-80 rounded-full bg-indigo-500/20 blur-3xl"
+            />
+            <div
+              aria-hidden="true"
+              className="pointer-events-none absolute -bottom-20 -left-20 h-80 w-80 rounded-full bg-teal-500/20 blur-3xl"
+            />
+
+            <div className="relative grid items-center gap-8 lg:grid-cols-[1.2fr_1fr]">
+              <div>
+                <div className="inline-flex items-center gap-2 rounded-full border border-teal-400/30 bg-teal-400/10 px-3.5 py-1.5 text-xs font-semibold text-teal-300">
+                  <ShieldCheck className="h-4 w-4" /> Built around your comfort &amp; dignity
                 </div>
-                <div className="mt-4 flex items-center justify-between rounded-2xl bg-[#171a32] p-4 text-white">
-                  <div><p className="text-[10px] font-semibold text-white/55">ONE SMALL STEP</p><p className="mt-1 text-sm font-semibold">Let’s find a way forward.</p></div>
-                  <Link href={startHref} aria-label="Begin a check-in" className="flex h-10 w-10 items-center justify-center rounded-xl bg-white text-indigo transition hover:bg-teal-50"><ArrowRight className="h-4 w-4" /></Link>
+                <h2 className="mt-5 text-3xl font-extrabold tracking-tight sm:text-4xl">
+                  Your story. Your comfort. Always your choice.
+                </h2>
+                <p className="mt-4 max-w-xl text-sm leading-relaxed text-slate-300 sm:text-base">
+                  Mental health support should never feel intrusive or overwhelming. You are always
+                  in the driver’s seat of your information, your pacing, and whom you choose to speak with.
+                </p>
+              </div>
+
+              <div className="space-y-4 rounded-2xl border border-white/10 bg-white/5 p-6 backdrop-blur-sm text-sm text-slate-200">
+                <div className="flex items-start gap-3">
+                  <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-teal-500/20 text-teal-400">
+                    <Check className="h-3.5 w-3.5" />
+                  </span>
+                  <span>Zero audio or video recordings stored from your sessions.</span>
                 </div>
-                <div className="mt-5 grid grid-cols-3 divide-x divide-slate-100">
-                  {[['01', 'Check in'], ['02', 'Understand'], ['03', 'Connect']].map(([number, label]) => <div key={number} className="px-2 text-center"><span className="text-[9px] font-bold text-violet">{number}</span><p className="mt-1 text-[10px] font-medium text-slate-500">{label}</p></div>)}
+                <div className="flex items-start gap-3">
+                  <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-teal-500/20 text-teal-400">
+                    <Check className="h-3.5 w-3.5" />
+                  </span>
+                  <span>You decide whether to share assessment notes with your provider.</span>
+                </div>
+                <div className="flex items-start gap-3">
+                  <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-teal-500/20 text-teal-400">
+                    <Check className="h-3.5 w-3.5" />
+                  </span>
+                  <span>Screenings offer reflection points, never a mandatory label.</span>
                 </div>
               </div>
             </div>
-            <div className="absolute -left-5 top-[42%] hidden -translate-x-1/2 rounded-2xl border border-white/80 bg-white/90 p-3 shadow-[0_16px_35px_-20px_rgba(30,30,60,.35)] sm:block">
-              <div className="flex items-center gap-2"><span className="flex h-8 w-8 items-center justify-center rounded-full bg-teal/10 text-teal"><ShieldCheck className="h-4 w-4" /></span><div><p className="text-[10px] font-semibold text-ink">A private first step</p><p className="mt-0.5 text-[9px] text-slate-400">At your own pace</p></div></div>
+          </div>
+        </div>
+      </section>
+
+      {/* FAQs Section */}
+      <section id="faq" className="border-t border-slate-200/80 bg-white py-20 md:py-24">
+        <div className="mx-auto max-w-5xl px-5 sm:px-8">
+          <div className="text-center">
+            <span className="text-xs font-bold uppercase tracking-wider text-indigo-600">
+              Clear &amp; straightforward
+            </span>
+            <h2 className="mt-3 text-3xl font-extrabold tracking-tight text-slate-900 sm:text-4xl">
+              Frequently Asked Questions
+            </h2>
+            <p className="mt-3 text-sm text-slate-600">
+              Clear, compassionate answers to help you feel completely informed.
+            </p>
+          </div>
+
+          <div className="mt-12 divide-y divide-slate-200/90 rounded-3xl border border-slate-200/80 bg-[#FAF9F6] p-6 sm:p-8">
+            {faqs.map((faq) => (
+              <details key={faq.q} className="group py-5 first:pt-0 last:pb-0">
+                <summary className="flex cursor-pointer list-none items-center justify-between gap-4 text-base font-bold text-slate-900 [&::-webkit-details-marker]:hidden">
+                  {faq.q}
+                  <ChevronDown className="h-5 w-5 shrink-0 text-slate-400 transition group-open:rotate-180" />
+                </summary>
+                <p className="mt-3 text-sm leading-relaxed text-slate-600">{faq.a}</p>
+              </details>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Calming Emergency Footer & Legal Bar */}
+      <footer className="border-t border-slate-200 bg-[#F5F3EF]">
+        <div className="mx-auto max-w-7xl px-5 py-12 sm:px-8">
+          <div className="flex flex-col gap-6 rounded-3xl border border-rose-200/80 bg-rose-50/90 p-6 sm:flex-row sm:items-center sm:justify-between sm:p-8">
+            <div>
+              <p className="text-sm font-bold text-rose-950">
+                Need immediate emergency support in India?
+              </p>
+              <p className="mt-1 text-xs leading-relaxed text-rose-900/80">
+                If you are in distress or experiencing thoughts of harm, call National Emergency{' '}
+                <a href="tel:112" className="font-bold underline">
+                  112
+                </a>{' '}
+                or Tele-MANAS at{' '}
+                <a href="tel:14416" className="font-bold underline">
+                  14416
+                </a>{' '}
+                (toll-free, available 24/7 in multiple languages).
+              </p>
+            </div>
+            <Link
+              href={startHref}
+              className="inline-flex h-11 shrink-0 items-center justify-center gap-2 rounded-xl bg-slate-900 px-5 text-xs font-bold text-white transition hover:bg-indigo-600"
+            >
+              Take a Gentle Step <ArrowRight className="h-3.5 w-3.5" />
+            </Link>
+          </div>
+
+          <div className="mt-10 flex flex-col items-center justify-between gap-6 border-t border-slate-200/70 pt-8 sm:flex-row">
+            <div className="flex items-center gap-3">
+              <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-slate-900 text-white">
+                <Sparkles className="h-4 w-4 text-teal-400" />
+              </span>
+              <div>
+                <span className="text-base font-bold text-slate-900">Destiny.</span>
+                <span className="block text-[11px] text-slate-500">Care on your terms</span>
+              </div>
+            </div>
+
+            <div className="flex flex-wrap items-center justify-center gap-6 text-xs font-medium text-slate-600">
+              <Link href="/for-patients" className="transition hover:text-indigo-600">
+                For Clients
+              </Link>
+              <Link href="/for-professionals" className="transition hover:text-indigo-600">
+                For Professionals
+              </Link>
+              <Link href="/login" className="transition hover:text-indigo-600">
+                Client Sign In
+              </Link>
+              <Link href="/professional-login" className="transition hover:text-indigo-600">
+                Professional Sign In
+              </Link>
             </div>
           </div>
-        </div>
-      </section>
 
-      <section className="border-y border-slate-200/70 bg-white/75">
-        <div className="mx-auto grid max-w-7xl gap-5 px-5 py-6 sm:grid-cols-3 sm:gap-8 md:px-8">
-          {[['Start with yourself', 'No special words needed.'], ['Understand your options', 'Clear, compassionate guidance.'], ['Choose what feels right', 'Take each step in your own time.']].map(([title, copy], index) => <div key={title} className="flex items-center gap-3"><span className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-xl ${index === 1 ? 'bg-teal/10 text-teal' : 'bg-violet/10 text-violet'}`}>{index === 0 ? <Heart className="h-4 w-4" /> : index === 1 ? <Compass className="h-4 w-4" /> : <Check className="h-4 w-4" />}</span><div><p className="text-xs font-semibold text-ink">{title}</p><p className="mt-1 text-[10px] text-slate-500">{copy}</p></div></div>)}
-        </div>
-      </section>
-
-      <section id="how-it-works" className="mx-auto max-w-7xl px-5 py-20 md:px-8 md:py-24">
-        <div className="grid gap-8 md:grid-cols-[.8fr_1.2fr] md:items-end"><div><p className="text-[10px] font-bold uppercase tracking-[.17em] text-violet">A simple path forward</p><h2 className="mt-3 text-3xl font-semibold leading-tight tracking-tight text-ink sm:text-4xl">One step at a time.<br />That’s enough.</h2></div><p className="max-w-xl text-sm leading-7 text-slate-500">Whether you know exactly what you need or are just beginning to wonder, Destiny helps make the next step feel a little clearer.</p></div>
-        <div className="mt-9 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">{[
-          { number: '01', icon: Brain, title: 'Check in', copy: 'Answer a few guided questions in your own time.' },
-          { number: '02', icon: Sparkles, title: 'Get a care report', copy: 'See your responses in straightforward, human language.' },
-          { number: '03', icon: HeartHandshake, title: 'Explore support', copy: 'Browse sample profiles and appointment times.' },
-          { number: '04', icon: AudioLines, title: 'Keep noticing', copy: 'Use gentle daily check-ins to reflect on your routines.' },
-        ].map(({ number, icon: Icon, title, copy }) => <article key={number} className="group rounded-[1.5rem] border border-slate-200/80 bg-white p-5 transition hover:-translate-y-1 hover:border-violet/25 hover:shadow-[0_18px_40px_-28px_rgba(60,50,120,.3)]"><div className="flex items-center justify-between"><span className="text-[10px] font-bold tracking-[.15em] text-slate-400">{number} / 04</span><span className="flex h-9 w-9 items-center justify-center rounded-xl bg-violet/[.07] text-violet transition group-hover:bg-violet group-hover:text-white"><Icon className="h-4 w-4" /></span></div><h3 className="mt-5 text-base font-semibold text-ink">{title}</h3><p className="mt-2 text-xs leading-6 text-slate-500">{copy}</p></article>)}</div>
-      </section>
-
-      <section id="care" className="bg-[#f1f0fa]">
-        <div className="mx-auto max-w-7xl px-5 py-20 md:px-8 md:py-24">
-          <div className="max-w-2xl"><p className="text-[10px] font-bold uppercase tracking-[.17em] text-indigo">Different kinds of care</p><h2 className="mt-3 text-3xl font-semibold tracking-tight text-ink sm:text-4xl">Who might I talk to?</h2><p className="mt-3 text-sm leading-7 text-slate-600">There isn’t one right answer. Here’s a simple overview to help you get oriented.</p></div>
-          <div className="mt-8 grid gap-4 md:grid-cols-3">{[
-            { title: 'Counsellor', icon: MessageCircleHeart, label: 'Talk it through', copy: 'A supportive space for life changes, relationships, everyday stress, and making sense of how you feel.', href: '/counsellors', tint: 'bg-teal/10 text-teal' },
-            { title: 'Therapist', icon: HeartHandshake, label: 'Build new tools', copy: 'Structured conversations to explore patterns, practise coping skills, and work toward your goals.', href: '/therapists', tint: 'bg-violet/10 text-violet' },
-            { title: 'Psychiatrist', icon: Stethoscope, label: 'Medical perspective', copy: 'A medical professional who can assess mental health and discuss clinical treatment options.', href: '/therapists', tint: 'bg-indigo/10 text-indigo' },
-          ].map(({ title, icon: Icon, label, copy, href, tint }) => <article key={title} className="flex flex-col rounded-[1.5rem] border border-white/90 bg-white p-6 shadow-[0_14px_45px_-35px_rgba(30,30,70,.35)]"><span className={`flex h-11 w-11 items-center justify-center rounded-xl ${tint}`}><Icon className="h-5 w-5" /></span><p className="mt-5 text-[10px] font-bold uppercase tracking-[.15em] text-slate-400">{label}</p><h3 className="mt-1.5 text-lg font-semibold text-ink">{title}</h3><p className="mt-2 flex-1 text-xs leading-6 text-slate-500">{copy}</p><Link href={href} className="mt-5 inline-flex items-center gap-1.5 text-xs font-semibold text-indigo hover:underline">Explore sample profiles <ArrowRight className="h-3.5 w-3.5" /></Link></article>)}</div>
-        </div>
-      </section>
-
-      <section className="mx-auto max-w-7xl px-5 py-20 md:px-8 md:py-24">
-        <div className="relative overflow-hidden rounded-[2rem] bg-[#171a32] px-6 py-9 text-white sm:px-10 sm:py-12">
-          <div aria-hidden="true" className="pointer-events-none absolute -right-20 -top-40 h-80 w-80 rounded-full bg-violet/30 blur-3xl" />
-          <div aria-hidden="true" className="pointer-events-none absolute bottom-0 right-[28%] h-40 w-40 rounded-full bg-teal/20 blur-3xl" />
-          <div className="relative grid gap-8 md:grid-cols-[1fr_auto] md:items-center">
-            <div className="max-w-2xl"><div className="flex h-10 w-10 items-center justify-center rounded-xl bg-white/10 text-teal"><ShieldCheck className="h-5 w-5" /></div><p className="mt-5 text-[10px] font-bold uppercase tracking-[.16em] text-teal">Built around your comfort</p><h2 className="mt-2 text-2xl font-semibold tracking-tight sm:text-3xl">Your story. Your pace. Your choice.</h2><p className="mt-3 text-sm leading-7 text-white/60">This prototype is a place to explore how a care journey might work. Your check-in should never feel like a test you have to pass.</p></div>
-            <div className="space-y-3 text-xs text-white/75">{['No recordings or session transcripts', 'You choose when to take the next step', 'Screening is not a diagnosis'].map((item) => <p key={item} className="flex items-center gap-2.5"><span className="flex h-5 w-5 items-center justify-center rounded-full bg-teal/15 text-teal"><Check className="h-3 w-3" /></span>{item}</p>)}</div>
-          </div>
-        </div>
-      </section>
-
-      <section id="faq" className="border-t border-slate-200/70 bg-white">
-        <div className="mx-auto grid max-w-7xl gap-8 px-5 py-20 md:grid-cols-[.7fr_1.3fr] md:px-8 md:py-24">
-          <div><p className="text-[10px] font-bold uppercase tracking-[.17em] text-violet">A few useful things</p><h2 className="mt-3 text-3xl font-semibold tracking-tight text-ink">Questions, answered.</h2><p className="mt-3 text-sm leading-6 text-slate-500">Clear answers about the care and tools available here.</p><span className="mt-6 inline-flex items-center gap-2 text-xs text-slate-400"><CircleHelp className="h-4 w-4" /> We’re here to make things clearer.</span></div>
-          <div className="divide-y divide-slate-100">{faqs.map(([question, answer]) => <details key={question} className="group py-4"><summary className="flex cursor-pointer list-none items-center justify-between gap-4 text-sm font-semibold text-ink [&::-webkit-details-marker]:hidden">{question}<ChevronDown className="h-4 w-4 shrink-0 text-slate-400 transition group-open:rotate-180" /></summary><p className="max-w-2xl pr-8 pt-3 text-xs leading-6 text-slate-500">{answer}</p></details>)}</div>
-        </div>
-      </section>
-
-      <footer className="bg-[#f4f1ee]">
-        <div className="mx-auto max-w-7xl px-5 py-8 md:px-8">
-          <div className="flex flex-col gap-5 rounded-[1.5rem] border border-rose-200/70 bg-rose-50/80 p-5 sm:flex-row sm:items-center sm:justify-between">
-            <div><p className="text-xs font-semibold text-rose-950">Need immediate support in India?</p><p className="mt-1 text-xs leading-5 text-rose-950/70">Call emergency services <a href="tel:112" className="font-bold underline">112</a> or contact Tele-MANAS at <a href="tel:14416" className="font-bold underline">14416</a>.</p><p className="mt-1 text-[10px] text-rose-950/55">Destiny does not replace emergency care.</p></div>
-            <Link href={startHref} className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl bg-[#171a32] px-4 text-xs font-semibold text-white transition hover:bg-indigo">Take a small first step <ArrowRight className="h-3.5 w-3.5" /></Link>
-          </div>
-          <div className="flex flex-col gap-3 py-6 sm:flex-row sm:items-center sm:justify-between"><Link href="/" className="flex items-center gap-2 text-sm font-semibold"><span className="flex h-7 w-7 items-center justify-center rounded-lg bg-[#171a32] text-white"><Sparkles className="h-3.5 w-3.5 text-teal" /></span> Destiny.</Link><p className="text-[10px] leading-5 text-slate-500">Provider profiles are illustrative and not verified. Destiny is not a clinical service. Please do not enter real health information.</p><div className="flex gap-4 text-[10px] font-medium text-slate-500"><Link href="/professional-register" className="hover:text-indigo">For professionals</Link><Link href="/for-patients" className="hover:text-indigo">For patients</Link></div></div>
+          <p className="mt-6 text-center text-[11px] leading-relaxed text-slate-400">
+            Destiny is a supportive exploration prototype. Provider profiles are illustrative and
+            not verified clinicians. Do not enter real or sensitive health information.
+          </p>
         </div>
       </footer>
-    </main>
+    </div>
   )
 }

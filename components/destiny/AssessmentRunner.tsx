@@ -87,7 +87,7 @@ export function AssessmentRunner({ type }: { type: AssessmentType }) {
 
   return (
     <div className="mx-auto max-w-3xl px-5 py-10 md:py-16">
-      <p className="text-sm font-semibold uppercase tracking-[0.18em] text-violet">A private check-in · about 5 minutes</p>
+      <p className="text-sm font-semibold uppercase tracking-[0.18em] text-violet">A private assessment · about 5 minutes</p>
       <div className="mt-5 flex items-center justify-between text-sm text-muted-foreground">
         <span>Question {index + 1} of {questions.length}</span>
         <span>{Math.round(((index + 1) / questions.length) * 100)}%</span>

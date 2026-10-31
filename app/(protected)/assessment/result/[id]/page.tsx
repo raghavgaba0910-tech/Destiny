@@ -41,7 +41,7 @@ export default async function AssessmentResultPage({
         <p className="mt-3 text-sm leading-6 text-slate-600">Suggested next step: consider talking with a {result.recommendation.toLowerCase()}. You can decide whether that feels right for you; this screening is not a diagnosis.</p>
         <p className="mt-2 text-xs text-slate-500">Report date: {new Date(assessment.createdAt).toLocaleString('en-IN')} · Score {result.score} · Assessment: {assessmentTitles[assessment.type]}</p>
         {result.flagged && <div role="alert" className="mt-5 rounded-2xl border border-coral/40 bg-coral/10 p-4 text-sm leading-6"><strong>Please reach out for support.</strong> Your response suggests you may benefit from speaking with a professional soon. If you are in immediate danger, call India emergency services <a href="tel:112" className="font-bold underline">112</a> or Tele-MANAS <a href="tel:14416" className="font-bold underline">14416</a>.</div>}
-        <div className="mt-6 flex flex-wrap gap-3"><PrintButton /><Link href="/assessment" className="rounded-xl bg-indigo px-4 py-2.5 text-sm font-semibold text-white">Another check-in</Link></div>
+        <div className="mt-6 flex flex-wrap gap-3"><PrintButton /><Link href="/assessment" className="rounded-xl bg-indigo px-4 py-2.5 text-sm font-semibold text-white">Take another assessment</Link></div>
       </div>
     </section>
     <section className="mt-8 rounded-3xl border bg-white p-6 print:break-before-page">

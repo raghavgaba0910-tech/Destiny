@@ -58,19 +58,6 @@ export default async function HomePage() {
       {/* Header */}
       <PublicHeader isLoggedIn={isLoggedIn} homeHref={homeHref} />
 
-      {/* Immediate Helpline Notice */}
-      <aside aria-label="Crisis helpline notice" className="border-b border-[#E8C8D2] bg-[#FBECEF] px-4 py-2.5 text-center text-xs text-[#6B3346]">
-        <span className="font-semibold">Need urgent support in India?</span> Call emergency{' '}
-        <a href="tel:112" className="font-bold underline text-[#BD6999]">
-          112
-        </a>{' '}
-        or Tele-MANAS at{' '}
-        <a href="tel:14416" className="font-bold underline text-[#BD6999]">
-          14416
-        </a>{' '}
-        (Toll-Free, 24/7). You are never alone.
-      </aside>
-
       {/* Hero Section */}
       <section className="relative overflow-hidden py-12 md:py-20 lg:py-24">
         {/* Soothing background auras */}

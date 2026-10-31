@@ -59,38 +59,38 @@ export default function AccessPortal({ audience }: AccessPortalProps) {
   const Icon = content.icon
 
   return (
-    <main className="min-h-screen bg-[#fbfaf8] px-5 py-8 text-[#17182a] sm:px-8 sm:py-12">
+    <main className="min-h-screen bg-[#F5F3F8] px-5 py-8 text-[#221C35] sm:px-8 sm:py-12">
       <div className="mx-auto max-w-5xl">
-        <Link href="/" className="inline-flex items-center gap-2 text-sm font-medium text-slate-600 transition hover:text-indigo">
+        <Link href="/" className="inline-flex items-center gap-2 text-sm font-medium text-[#554E6B] transition hover:text-[#483D76]">
           <ArrowLeft className="h-4 w-4" /> Back to Destiny
         </Link>
-        <section className="mt-8 overflow-hidden rounded-[2rem] border border-slate-200/80 bg-white shadow-[0_24px_80px_-48px_rgba(23,26,50,.32)]">
-          <div className="bg-[#171a32] px-6 py-9 text-white sm:px-10 sm:py-12">
+        <section className="mt-8 overflow-hidden rounded-[2rem] border border-[#D3CCE2] bg-white shadow-[0_24px_80px_-48px_rgba(34,28,53,.25)]">
+          <div className="bg-gradient-to-br from-[#19152B] to-[#2A214C] px-6 py-9 text-[#F5F3F8] sm:px-10 sm:py-12">
             <Link href="/" className="inline-flex items-center gap-2 text-sm font-semibold">
-              <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-white/10"><Sparkles className="h-4 w-4 text-teal" /></span>
-              Destiny<span className="text-teal">.</span>
+              <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-white/10"><Sparkles className="h-4 w-4 text-[#BD6999]" /></span>
+              Destiny<span className="text-[#BD6999]">.</span>
             </Link>
             <div className="mt-10 flex items-start gap-4">
-              <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-white/10 text-teal"><Icon className="h-6 w-6" /></span>
+              <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-white/10 text-[#BD6999]"><Icon className="h-6 w-6" /></span>
               <div>
-                <p className="text-[10px] font-bold uppercase tracking-[.17em] text-teal">{content.eyebrow}</p>
-                <h1 className="mt-2 max-w-2xl text-3xl font-semibold tracking-tight sm:text-4xl">{content.title}</h1>
-                <p className="mt-3 max-w-2xl text-sm leading-6 text-white/65">{content.description}</p>
+                <p className="text-[10px] font-bold uppercase tracking-[.17em] text-[#D5CEEC]">{content.eyebrow}</p>
+                <h1 className="mt-2 max-w-2xl text-3xl font-semibold tracking-tight text-[#F5F3F8] sm:text-4xl">{content.title}</h1>
+                <p className="mt-3 max-w-2xl text-sm leading-6 text-[#D5CEEC]/80">{content.description}</p>
               </div>
             </div>
           </div>
           <div className="grid gap-4 p-5 sm:grid-cols-2 sm:p-8">
             {content.actions.map((action) => (
-              <Link key={action.href} href={action.href} className="group flex min-h-48 flex-col rounded-2xl border border-slate-200 bg-[#fbfaf8] p-5 transition hover:-translate-y-0.5 hover:border-violet/30 hover:bg-white hover:shadow-lg sm:p-6">
-                <h2 className="text-lg font-semibold tracking-tight">{action.title}</h2>
-                <p className="mt-2 text-sm leading-6 text-slate-600">{action.description}</p>
-                <span className="mt-auto inline-flex items-center gap-2 pt-6 text-sm font-semibold text-indigo">
+              <Link key={action.href} href={action.href} className="group flex min-h-48 flex-col rounded-2xl border border-[#D3CCE2] bg-[#F5F3F8] p-5 transition hover:-translate-y-0.5 hover:border-[#BD6999] hover:bg-white hover:shadow-lg sm:p-6">
+                <h2 className="text-lg font-semibold tracking-tight text-[#221C35]">{action.title}</h2>
+                <p className="mt-2 text-sm leading-6 text-[#554E6B]">{action.description}</p>
+                <span className="mt-auto inline-flex items-center gap-2 pt-6 text-sm font-semibold text-[#483D76] group-hover:text-[#372E5A]">
                   {action.label}<ArrowRight className="h-4 w-4 transition group-hover:translate-x-1" />
                 </span>
               </Link>
             ))}
           </div>
-          <p className="px-6 pb-6 text-center text-[10px] leading-5 text-slate-400 sm:px-8">Destiny is not a clinical or emergency service. If you need urgent support in India, call 112 or Tele-MANAS at 14416.</p>
+          <p className="px-6 pb-6 text-center text-[10px] leading-5 text-[#766F8C] sm:px-8">Destiny is not a clinical or emergency service. If you need urgent support in India, call <a href="tel:112" className="underline font-semibold text-[#BD6999]">112</a> or Tele-MANAS at <a href="tel:14416" className="underline font-semibold text-[#BD6999]">14416</a>.</p>
         </section>
       </div>
     </main>

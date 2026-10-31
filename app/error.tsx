@@ -13,7 +13,9 @@ export default function RootError({
   reset: () => void
 }) {
   useEffect(() => {
-    console.error('[Destiny Root Error]:', error)
+    try {
+      console.error('[Destiny Root Error]:', error instanceof Error ? error.message : error)
+    } catch {}
   }, [error])
 
   return (

@@ -31,8 +31,8 @@ const config: Config = {
         cream:  '#FFF8F0',
       },
       fontFamily: {
-        heading: ['Sora', 'sans-serif'],
-        body:    ['Inter', 'sans-serif'],
+        heading: ['var(--font-heading)', 'Plus Jakarta Sans', 'Sora', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
+        body:    ['var(--font-body)', 'Inter', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
       },
       borderRadius: {
         '2xl': '1rem',

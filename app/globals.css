@@ -4,26 +4,28 @@
 
 @layer base {
   :root {
-    --background: 30 100% 97%;
-    --foreground: 225 48% 9%;
+    --background: 40 33% 98%; /* #FAF9F6 Soothing warm porcelain */
+    --foreground: 228 35% 12%; /* #141829 Deep gentle ink */
     --card: 0 0% 100%;
-    --card-foreground: 225 48% 9%;
+    --card-foreground: 228 35% 12%;
     --popover: 0 0% 100%;
-    --popover-foreground: 225 48% 9%;
+    --popover-foreground: 228 35% 12%;
     --primary: 243 75% 59%;
     --primary-foreground: 0 0% 100%;
-    --secondary: 258 89% 66%;
+    --secondary: 258 85% 64%;
     --secondary-foreground: 0 0% 100%;
-    --muted: 210 40% 96%;
-    --muted-foreground: 215 16% 47%;
-    --accent: 173 80% 40%;
+    --muted: 35 25% 95%;
+    --muted-foreground: 220 14% 46%;
+    --accent: 173 80% 36%;
     --accent-foreground: 0 0% 100%;
-    --destructive: 350 90% 60%;
+    --destructive: 350 85% 60%;
     --destructive-foreground: 0 0% 100%;
-    --border: 214 32% 91%;
-    --input: 214 32% 91%;
+    --border: 220 20% 90%;
+    --input: 220 20% 90%;
     --ring: 243 75% 59%;
-    --radius: 0.75rem;
+    --radius: 1rem;
+    --font-heading: 'Plus Jakarta Sans', sans-serif;
+    --font-body: 'Inter', sans-serif;
   }
   .dark {
     --background: 225 48% 9%;
@@ -50,8 +52,13 @@
 
 @layer base {
   * { @apply border-border; }
+  html {
+    scroll-behavior: smooth;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
   body { @apply bg-background text-foreground font-body text-base; }
-  h1, h2, h3, h4, h5, h6 { @apply font-heading; }
+  h1, h2, h3, h4, h5, h6 { @apply font-heading tracking-tight; }
 }
 
 @media (prefers-reduced-motion: reduce) {

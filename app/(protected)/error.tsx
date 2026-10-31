@@ -13,7 +13,9 @@ export default function ProtectedError({
   reset: () => void
 }) {
   useEffect(() => {
-    console.error('[Destiny Protected Route Error]:', error)
+    try {
+      console.error('[Destiny Protected Route Error]:', error instanceof Error ? error.message : error)
+    } catch {}
   }, [error])
 
   return (

@@ -1,5 +1,5 @@
-import { redirect } from 'next/navigation'
+import AccessPortal from '@/components/auth/access-portal'
 
 export default function ProfessionalPortalPage() {
-  redirect('/professional-register')
+  return <AccessPortal audience="professional" />
 }

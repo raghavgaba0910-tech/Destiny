@@ -77,8 +77,7 @@ export default async function HomePage() {
 
               <h1 className="mt-6 text-4xl font-extrabold tracking-tight text-[#221C35] sm:text-5xl lg:text-6xl lg:leading-[1.15]">
                 You don’t have to carry it{' '}
-                <span className="text-[#BD6999]">all figured </span>
-                <span className="text-[#483D76]">out.</span>
+                <span className="text-[#BD6999]">all figured</span> out.
               </h1>
 
               <p className="mt-6 text-base leading-relaxed text-[#554E6B] sm:text-lg sm:leading-8">
@@ -88,10 +87,10 @@ export default async function HomePage() {
               </p>
 
               {/* Primary Actions */}
-              <div className="mt-8 flex flex-col gap-3.5 sm:flex-row sm:items-center">
+              <div className="mt-8 flex flex-col gap-3 w-full sm:w-auto sm:flex-row sm:items-center">
                 <Link
                   href={startHref}
-                  className="inline-flex h-13 items-center justify-center gap-2.5 rounded-2xl bg-[#483D76] px-6 text-sm font-bold text-[#F5F3F8] shadow-lg shadow-[#483D76]/15 transition hover:-translate-y-0.5 hover:bg-[#372E5A]"
+                  className="inline-flex h-12 w-full sm:w-auto items-center justify-center gap-2 rounded-full bg-[#483D76] px-6 text-sm font-semibold text-[#F5F3F8] shadow-md shadow-[#483D76]/20 transition-all hover:bg-[#372E5A] hover:shadow-lg active:scale-[0.98]"
                 >
                   Take a Free Assessment
                   <ArrowRight className="h-4 w-4" />
@@ -99,7 +98,7 @@ export default async function HomePage() {
 
                 <Link
                   href={isLoggedIn ? '/therapists' : '/for-patients'}
-                  className="inline-flex h-13 items-center justify-center rounded-2xl border border-[#D3CCE2] bg-[#F5F3F8] px-6 text-sm font-semibold text-[#221C35] shadow-sm transition hover:border-[#C8BCE0] hover:bg-[#EAE6F0]"
+                  className="inline-flex h-12 w-full sm:w-auto items-center justify-center gap-2 rounded-full border border-[#D3CCE2] bg-white px-6 text-sm font-semibold text-[#221C35] shadow-xs transition-all hover:border-[#C8BCE0] hover:bg-[#EAE6F0] active:scale-[0.98]"
                 >
                   Explore Support Providers
                 </Link>

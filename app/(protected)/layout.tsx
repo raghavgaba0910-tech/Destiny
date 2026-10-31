@@ -10,7 +10,7 @@ export default async function ProtectedLayout({ children }: { children: React.Re
   const isAdmin = session.user.role === 'ADMIN'
 
   return (
-    <div className="min-h-screen bg-[#f8f7f4]">
+    <div className="min-h-screen bg-[#F5F3F8]">
       <div className="print:hidden"><Sidebar name={session.user.name ?? 'Destiny member'} email={session.user.email ?? ''} role={session.user.role} /></div>
       <main className="pb-[calc(4.5rem+env(safe-area-inset-bottom))] lg:pb-0 lg:pl-[264px]">
         {children}

@@ -76,18 +76,18 @@ export function HomeInteractiveCare({ isLoggedIn }: { isLoggedIn: boolean }) {
   const destinationHref = isLoggedIn ? current.recommendedPath : '/for-patients'
 
   return (
-    <div className="relative rounded-3xl border border-slate-200/90 bg-white/95 p-6 shadow-xl shadow-slate-900/5 backdrop-blur-sm sm:p-8">
-      <div className="flex items-center justify-between border-b border-slate-100 pb-4">
+    <div className="relative rounded-3xl border border-[#D3CCE2] bg-[#EAE6F0] p-6 shadow-xl shadow-[#221C35]/5 sm:p-8">
+      <div className="flex items-center justify-between border-b border-[#D3CCE2] pb-4">
         <div className="flex items-center gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-indigo-50 text-indigo-600">
+          <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-[#EBE4F2] text-[#483D76]">
             <Heart className="h-5 w-5" />
           </div>
           <div>
-            <h3 className="text-sm font-bold text-slate-900">How are things feeling right now?</h3>
-            <p className="text-xs text-slate-500">Pick whatever resonates most today</p>
+            <h3 className="text-sm font-bold text-[#221C35]">How are things feeling right now?</h3>
+            <p className="text-xs text-[#554E6B]">Pick whatever resonates most today</p>
           </div>
         </div>
-        <span className="inline-flex items-center gap-1.5 rounded-full bg-teal-50 px-3 py-1 text-xs font-semibold text-teal-700">
+        <span className="inline-flex items-center gap-1.5 rounded-full border border-[#C8BCE0] bg-[#EBE4F2] px-3 py-1 text-xs font-semibold text-[#483D76]">
           <Sparkles className="h-3.5 w-3.5" /> Gentle Start
         </span>
       </div>
@@ -101,20 +101,24 @@ export function HomeInteractiveCare({ isLoggedIn }: { isLoggedIn: boolean }) {
               key={item.key}
               type="button"
               onClick={() => setSelectedMood(item.key)}
-              className={`flex items-start gap-3 rounded-2xl border p-3.5 text-left transition-all duration-200 ${
+              className={`flex items-start gap-3 rounded-2xl p-3.5 text-left transition-all duration-200 ${
                 isSelected
-                  ? `${item.borderColor} ${item.bgSoft} ring-2 shadow-sm`
-                  : 'border-slate-200/80 bg-slate-50/60 hover:border-slate-300 hover:bg-white'
+                  ? 'border-2 border-[#483D76] bg-[#EBE4F2] shadow-sm'
+                  : 'border border-[#D3CCE2] bg-[#F5F3F8] hover:border-[#C8BCE0] hover:bg-white'
               }`}
             >
-              <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-white text-lg shadow-sm">
+              <span
+                className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-xl text-lg shadow-xs transition ${
+                  isSelected ? 'bg-[#483D76] text-white' : 'bg-white text-slate-800'
+                }`}
+              >
                 {item.emoji}
               </span>
               <div className="min-w-0">
-                <p className={`text-xs font-bold leading-tight ${isSelected ? 'text-slate-900' : 'text-slate-700'}`}>
+                <p className="text-xs font-bold leading-tight text-[#221C35]">
                   {item.label}
                 </p>
-                <p className="mt-0.5 text-[11px] leading-4 text-slate-500">{item.subtitle}</p>
+                <p className="mt-0.5 text-[11px] leading-4 text-[#554E6B]">{item.subtitle}</p>
               </div>
             </button>
           )
@@ -122,20 +126,20 @@ export function HomeInteractiveCare({ isLoggedIn }: { isLoggedIn: boolean }) {
       </div>
 
       {/* Reassurance & Suggested Next Step */}
-      <div className="mt-5 rounded-2xl border border-slate-200/90 bg-[#FAF9F6] p-4 sm:p-5">
+      <div className="mt-5 rounded-2xl border border-[#D3CCE2] bg-[#F5F3F8] p-4 sm:p-5">
         <div className="flex items-start gap-3">
-          <div className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-xl bg-indigo-100 text-indigo-700">
+          <div className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-xl bg-[#EBE4F2] text-[#483D76]">
             <Brain className="h-4 w-4" />
           </div>
           <div className="flex-1">
-            <p className="text-xs font-medium text-slate-700">{current.reassurance}</p>
-            <div className="mt-4 flex flex-wrap items-center justify-between gap-3 border-t border-slate-200/70 pt-3">
-              <span className="inline-flex items-center gap-1.5 text-xs text-slate-500">
-                <ShieldCheck className="h-3.5 w-3.5 text-teal-600" /> Free · Anonymous · No pressure
+            <p className="text-xs font-medium text-[#554E6B]">{current.reassurance}</p>
+            <div className="mt-4 flex flex-wrap items-center justify-between gap-3 border-t border-[#D3CCE2] pt-3">
+              <span className="inline-flex items-center gap-1.5 text-xs text-[#766F8C]">
+                <ShieldCheck className="h-3.5 w-3.5 text-[#483D76]" /> Free · Anonymous · No pressure
               </span>
               <Link
                 href={destinationHref}
-                className="inline-flex items-center gap-2 rounded-xl bg-slate-900 px-4 py-2 text-xs font-bold text-white shadow-sm transition hover:bg-indigo-600"
+                className="inline-flex items-center gap-2 rounded-xl bg-[#483D76] px-4 py-2 text-xs font-bold text-[#F5F3F8] shadow-sm transition hover:bg-[#372E5A]"
               >
                 {current.actionLabel}
                 <ArrowRight className="h-3.5 w-3.5" />
@@ -146,18 +150,18 @@ export function HomeInteractiveCare({ isLoggedIn }: { isLoggedIn: boolean }) {
       </div>
 
       {/* 3 Step reassurance bar */}
-      <div className="mt-5 grid grid-cols-3 divide-x divide-slate-100 rounded-xl bg-slate-50/80 py-3 text-center">
+      <div className="mt-5 grid grid-cols-3 divide-x divide-[#D3CCE2] rounded-xl border border-[#D3CCE2] bg-[#F5F3F8] py-3 text-center">
         <div className="px-2">
-          <span className="text-[11px] font-bold text-indigo-600">01. Reflect</span>
-          <p className="text-[10px] text-slate-500">3-min private assessment</p>
+          <span className="text-[11px] font-bold text-[#483D76]">01. Reflect</span>
+          <p className="text-[10px] text-[#554E6B]">3-min private assessment</p>
         </div>
         <div className="px-2">
-          <span className="text-[11px] font-bold text-violet-600">02. Understand</span>
-          <p className="text-[10px] text-slate-500">Human-language report</p>
+          <span className="text-[11px] font-bold text-[#BD6999]">02. Understand</span>
+          <p className="text-[10px] text-[#554E6B]">Human-language report</p>
         </div>
         <div className="px-2">
-          <span className="text-[11px] font-bold text-teal-600">03. Support</span>
-          <p className="text-[10px] text-slate-500">Connect in your time</p>
+          <span className="text-[11px] font-bold text-[#483D76]">03. Support</span>
+          <p className="text-[10px] text-[#554E6B]">Connect in your time</p>
         </div>
       </div>
     </div>

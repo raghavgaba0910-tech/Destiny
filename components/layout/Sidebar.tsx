@@ -91,24 +91,24 @@ export function Sidebar({
   return (
     <>
       {/* Mobile Top App Bar */}
-      <header className="sticky top-0 z-30 flex h-16 items-center justify-between border-b border-slate-200/80 bg-white/95 px-4 backdrop-blur-md lg:hidden">
+      <header className="sticky top-0 z-30 flex h-16 items-center justify-between border-b border-[#D3CCE2] bg-[#EAE6F0]/95 px-4 backdrop-blur-md lg:hidden">
         <Link
           href={isAdmin ? '/admin' : isProfessional ? '/pro' : '/dashboard'}
           className="flex items-center gap-2.5"
         >
-          <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-slate-900 text-white shadow-sm">
-            <Sparkles className="h-4 w-4 text-teal-400" />
+          <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#221C35] text-[#BD6999] shadow-sm">
+            <Sparkles className="h-4 w-4 text-[#BD6999]" />
           </span>
-          <span className="text-base font-bold tracking-tight text-slate-900">
-            Destiny<span className="text-violet-600">.</span>
+          <span className="text-base font-bold tracking-tight text-[#221C35]">
+            Destiny<span className="text-[#BD6999]">.</span>
           </span>
         </Link>
         <div className="flex items-center gap-3">
           <div className="flex items-center gap-2">
-            <span className="flex h-8 w-8 items-center justify-center rounded-full bg-indigo-100 text-xs font-bold text-indigo-700">
+            <span className="flex h-8 w-8 items-center justify-center rounded-full bg-[#EBE4F2] text-xs font-bold text-[#483D76]">
               {initials}
             </span>
-            <span className="max-w-28 truncate text-xs font-semibold text-slate-700 sm:max-w-40">
+            <span className="max-w-28 truncate text-xs font-semibold text-[#221C35] sm:max-w-40">
               {name}
             </span>
           </div>
@@ -116,7 +116,7 @@ export function Sidebar({
             type="button"
             aria-label="Sign out"
             onClick={() => void signOut({ callbackUrl: '/' })}
-            className="flex h-9 w-9 items-center justify-center rounded-xl text-slate-400 transition hover:bg-rose-50 hover:text-rose-600"
+            className="flex h-9 w-9 items-center justify-center rounded-xl text-[#766F8C] transition hover:bg-[#FBECEF] hover:text-[#6B3346]"
           >
             <LogOut className="h-4 w-4" />
           </button>
@@ -124,21 +124,21 @@ export function Sidebar({
       </header>
 
       {/* Desktop Sidebar */}
-      <aside className="fixed inset-y-0 left-0 z-40 hidden w-[272px] flex-col border-r border-slate-200/80 bg-white lg:flex">
+      <aside className="fixed inset-y-0 left-0 z-40 hidden w-[272px] flex-col border-r border-[#D3CCE2] bg-[#EAE6F0] lg:flex">
         {/* Brand Header */}
-        <div className="border-b border-slate-100 px-6 py-6">
+        <div className="border-b border-[#D3CCE2] px-6 py-6">
           <Link
             href={isAdmin ? '/admin' : isProfessional ? '/pro' : '/dashboard'}
             className="flex items-center gap-3"
           >
-            <span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-slate-900 text-white shadow-md shadow-indigo-950/10">
-              <Sparkles className="h-5 w-5 text-teal-400" />
+            <span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-[#221C35] text-[#BD6999] shadow-md shadow-[#221C35]/10">
+              <Sparkles className="h-5 w-5 text-[#BD6999]" />
             </span>
             <div>
-              <span className="block text-lg font-bold tracking-tight text-slate-900">
-                Destiny<span className="text-violet-600">.</span>
+              <span className="block text-lg font-bold tracking-tight text-[#221C35]">
+                Destiny<span className="text-[#BD6999]">.</span>
               </span>
-              <span className="block text-xs font-medium text-slate-400">
+              <span className="block text-xs font-medium text-[#766F8C]">
                 Care on your terms
               </span>
             </div>
@@ -147,14 +147,14 @@ export function Sidebar({
 
         {/* Member Profile Badge */}
         <div className="px-5 pt-5">
-          <div className="flex items-center gap-3 rounded-2xl border border-slate-100 bg-[#FAF9F6] p-3.5 shadow-sm">
-            <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-indigo-500 to-violet-600 text-sm font-bold text-white shadow-sm">
+          <div className="flex items-center gap-3 rounded-2xl border border-[#D3CCE2] bg-[#F5F3F8] p-3.5 shadow-sm">
+            <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-[#483D76] text-sm font-bold text-[#F5F3F8] shadow-sm">
               {initials}
             </span>
             <div className="min-w-0 flex-1">
-              <span className="block truncate text-xs font-bold text-slate-900">{name}</span>
-              <span className="inline-flex items-center gap-1 rounded-md bg-white px-2 py-0.5 text-[11px] font-semibold text-indigo-700 shadow-2xs border border-slate-200/60 mt-1">
-                <BadgeCheck className="h-3 w-3 text-teal-600" />
+              <span className="block truncate text-xs font-bold text-[#221C35]">{name}</span>
+              <span className="inline-flex items-center gap-1 rounded-md bg-[#EBE4F2] px-2 py-0.5 text-[11px] font-semibold text-[#483D76] shadow-2xs border border-[#C8BCE0] mt-1">
+                <BadgeCheck className="h-3 w-3 text-[#483D76]" />
                 {roleLabel}
               </span>
             </div>
@@ -165,7 +165,7 @@ export function Sidebar({
         <nav aria-label="Main navigation" className="flex-1 overflow-y-auto px-4 py-6">
           {isAdmin ? (
             <div className="space-y-1">
-              <p className="px-3 pb-2 text-xs font-bold uppercase tracking-wider text-slate-400">
+              <p className="px-3 pb-2 text-xs font-bold uppercase tracking-wider text-[#766F8C]">
                 Administration
               </p>
               <Link
@@ -173,18 +173,18 @@ export function Sidebar({
                 className={cn(
                   'flex min-h-11 items-center gap-3 rounded-xl px-3 text-xs font-semibold transition',
                   pathname === '/admin'
-                    ? 'bg-slate-900 text-white shadow-sm'
-                    : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
+                    ? 'bg-[#483D76] text-[#F5F3F8] shadow-sm hover:bg-[#372E5A]'
+                    : 'text-[#554E6B] hover:bg-[#EBE4F2]/70 hover:text-[#221C35]'
                 )}
               >
-                <ShieldCheck className="h-4 w-4 text-teal-400" />
+                <ShieldCheck className={cn('h-4 w-4', pathname === '/admin' ? 'text-[#F5F3F8]' : 'text-[#766F8C]')} />
                 Admin Workspace
               </Link>
             </div>
           ) : isProfessional ? (
             <div className="space-y-4">
               <div>
-                <p className="px-3 pb-2 text-xs font-bold uppercase tracking-wider text-slate-400">
+                <p className="px-3 pb-2 text-xs font-bold uppercase tracking-wider text-[#766F8C]">
                   Practice Workspace
                 </p>
                 <div className="space-y-1">
@@ -193,11 +193,11 @@ export function Sidebar({
                     className={cn(
                       'flex min-h-11 items-center gap-3 rounded-xl px-3 text-xs font-semibold transition',
                       pathname === '/pro'
-                        ? 'bg-slate-900 text-white shadow-sm'
-                        : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
+                        ? 'bg-[#483D76] text-[#F5F3F8] shadow-sm hover:bg-[#372E5A]'
+                        : 'text-[#554E6B] hover:bg-[#EBE4F2]/70 hover:text-[#221C35]'
                     )}
                   >
-                    <Stethoscope className="h-4 w-4 text-teal-400" />
+                    <Stethoscope className={cn('h-4 w-4', pathname === '/pro' ? 'text-[#FBF9F5]' : 'text-[#766F8C]')} />
                     Professional Console
                   </Link>
                   <Link
@@ -205,11 +205,11 @@ export function Sidebar({
                     className={cn(
                       'flex min-h-11 items-center gap-3 rounded-xl px-3 text-xs font-semibold transition',
                       pathname === '/appointments'
-                        ? 'bg-slate-900 text-white shadow-sm'
-                        : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
+                        ? 'bg-[#483D76] text-[#F5F3F8] shadow-sm hover:bg-[#372E5A]'
+                        : 'text-[#554E6B] hover:bg-[#EBE4F2]/70 hover:text-[#221C35]'
                     )}
                   >
-                    <CalendarDays className="h-4 w-4 text-indigo-500" />
+                    <CalendarDays className={cn('h-4 w-4', pathname === '/appointments' ? 'text-[#F5F3F8]' : 'text-[#766F8C]')} />
                     My Sessions
                   </Link>
                   <Link
@@ -217,11 +217,11 @@ export function Sidebar({
                     className={cn(
                       'flex min-h-11 items-center gap-3 rounded-xl px-3 text-xs font-semibold transition',
                       pathname === '/helpdesk'
-                        ? 'bg-slate-900 text-white shadow-sm'
-                        : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
+                        ? 'bg-[#483D76] text-[#F5F3F8] shadow-sm hover:bg-[#372E5A]'
+                        : 'text-[#554E6B] hover:bg-[#EBE4F2]/70 hover:text-[#221C35]'
                     )}
                   >
-                    <MessageCircleHeart className="h-4 w-4 text-violet-500" />
+                    <MessageCircleHeart className={cn('h-4 w-4', pathname === '/helpdesk' ? 'text-[#F5F3F8]' : 'text-[#766F8C]')} />
                     Help Desk
                   </Link>
                 </div>
@@ -231,7 +231,7 @@ export function Sidebar({
             <div className="space-y-6">
               {patientNavGroups.map((group) => (
                 <div key={group.title}>
-                  <p className="px-3 pb-2 text-[11px] font-bold uppercase tracking-wider text-slate-400">
+                  <p className="px-3 pb-2 text-[11px] font-bold uppercase tracking-wider text-[#766F8C]">
                     {group.title}
                   </p>
                   <div className="space-y-1">
@@ -248,16 +248,16 @@ export function Sidebar({
                           className={cn(
                             'group flex min-h-10 items-center gap-3 rounded-xl px-3 text-xs font-semibold transition',
                             active
-                              ? 'bg-slate-900 text-white shadow-sm'
-                              : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
+                              ? 'bg-[#483D76] text-[#F5F3F8] shadow-sm hover:bg-[#372E5A]'
+                              : 'text-[#554E6B] hover:bg-[#EBE4F2]/70 hover:text-[#221C35]'
                           )}
                         >
                           <Icon
                             className={cn(
                               'h-4 w-4 shrink-0 transition',
                               active
-                                ? 'text-teal-400'
-                                : 'text-slate-400 group-hover:text-indigo-600'
+                                ? 'text-[#F5F3F8]'
+                                : 'text-[#766F8C] group-hover:text-[#483D76]'
                             )}
                           />
                           {label}
@@ -274,26 +274,26 @@ export function Sidebar({
         {/* Emergency Reassurance Card */}
         {!isProfessional && !isAdmin && (
           <div className="px-4 pb-3">
-            <div className="rounded-2xl border border-rose-200/80 bg-rose-50/80 p-3.5">
-              <p className="text-xs font-bold text-rose-950">Immediate Help in India</p>
-              <p className="mt-1 text-[11px] leading-relaxed text-rose-900/80">
-                Emergency <a href="tel:112" className="font-bold underline">112</a> · Tele-MANAS{' '}
-                <a href="tel:14416" className="font-bold underline">14416</a>
+            <div className="rounded-2xl border border-[#E8C8D2] bg-[#FBECEF] p-3.5 text-[#6B3346]">
+              <p className="text-xs font-bold text-[#6B3346]">Immediate Help in India</p>
+              <p className="mt-1 text-[11px] leading-relaxed text-[#6B3346]/90">
+                Emergency <a href="tel:112" className="font-bold underline text-[#BD6999]">112</a> · Tele-MANAS{' '}
+                <a href="tel:14416" className="font-bold underline text-[#BD6999]">14416</a>
               </p>
             </div>
           </div>
         )}
 
         {/* Sign Out Footer */}
-        <div className="border-t border-slate-100 p-3">
+        <div className="border-t border-[#D3CCE2] p-3">
           <button
             type="button"
             onClick={() => void signOut({ callbackUrl: '/' })}
-            className="flex min-h-10 w-full items-center gap-3 rounded-xl px-3 text-xs font-medium text-slate-500 transition hover:bg-rose-50 hover:text-rose-600"
+            className="flex min-h-10 w-full items-center gap-3 rounded-xl px-3 text-xs font-medium text-[#554E6B] transition hover:bg-[#FBECEF] hover:text-[#6B3346]"
           >
             <LogOut className="h-4 w-4" />
             Sign out
-            <span className="ml-auto max-w-28 truncate text-[10px] text-slate-400">{email}</span>
+            <span className="ml-auto max-w-28 truncate text-[10px] text-[#766F8C]">{email}</span>
           </button>
         </div>
       </aside>

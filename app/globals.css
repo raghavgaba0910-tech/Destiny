@@ -4,25 +4,25 @@
 
 @layer base {
   :root {
-    --background: 40 33% 98%; /* #FAF9F6 Soothing warm porcelain */
-    --foreground: 228 35% 12%; /* #141829 Deep gentle ink */
-    --card: 0 0% 100%;
-    --card-foreground: 228 35% 12%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 228 35% 12%;
-    --primary: 243 75% 59%;
-    --primary-foreground: 0 0% 100%;
-    --secondary: 258 85% 64%;
-    --secondary-foreground: 0 0% 100%;
-    --muted: 35 25% 95%;
-    --muted-foreground: 220 14% 46%;
-    --accent: 173 80% 36%;
-    --accent-foreground: 0 0% 100%;
-    --destructive: 350 85% 60%;
-    --destructive-foreground: 0 0% 100%;
-    --border: 220 20% 90%;
-    --input: 220 20% 90%;
-    --ring: 243 75% 59%;
+    --background: 264 25% 96%; /* #F5F3F8 Soft Pale Lavender Mist */
+    --foreground: 254 31% 16%; /* #221C35 Deep Twilight Indigo */
+    --card: 264 25% 96%; /* #F5F3F8 */
+    --card-foreground: 254 31% 16%;
+    --popover: 264 25% 96%;
+    --popover-foreground: 254 31% 16%;
+    --primary: 252 32% 35%; /* #483D76 Royal Twilight Blue */
+    --primary-foreground: 264 25% 96%; /* #F5F3F8 */
+    --secondary: 326 39% 58%; /* #BD6999 Dusty Orchid Pink */
+    --secondary-foreground: 264 25% 96%;
+    --muted: 264 25% 92%; /* #EAE6F0 Soft Muted Lilac-Grey */
+    --muted-foreground: 254 12% 49%; /* #766F8C */
+    --accent: 326 39% 58%; /* #BD6999 Dusty Orchid Pink */
+    --accent-foreground: 264 25% 96%;
+    --destructive: 340 35% 31%; /* #6B3346 */
+    --destructive-foreground: 264 25% 96%;
+    --border: 259 28% 84%; /* #D3CCE2 */
+    --input: 259 28% 84%;
+    --ring: 252 32% 35%;
     --radius: 1rem;
     --font-heading: 'Plus Jakarta Sans', sans-serif;
     --font-body: 'Inter', sans-serif;

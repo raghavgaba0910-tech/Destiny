@@ -7,6 +7,7 @@ type MailMessage = {
   to: string
   subject: string
   html: string
+  text?: string
 }
 
 type MailResult = {
@@ -44,11 +45,11 @@ function escapeHtml(value: string): string {
 }
 
 function getMailTransport() {
-  const host = process.env.SMTP_HOST
-  const from = process.env.MAIL_FROM
-  const portText = process.env.SMTP_PORT
-  const username = process.env.SMTP_USER
-  const password = process.env.SMTP_PASSWORD
+  const host = process.env.SMTP_HOST?.trim()
+  const from = process.env.MAIL_FROM?.trim()
+  const portText = process.env.SMTP_PORT?.trim()
+  const username = process.env.SMTP_USER?.trim()
+  const password = process.env.SMTP_PASSWORD?.trim()
   const hasAnySmtpConfig = Boolean(host || from || portText || username || password)
 
   if (!host && !hasAnySmtpConfig) return null
@@ -58,16 +59,21 @@ function getMailTransport() {
   const port = portText ? Number(portText) : 587
   if (!Number.isInteger(port) || port < 1 || port > 65_535) throw new Error('SMTP_PORT must be a valid TCP port.')
 
+  const isGmail = host.toLowerCase().includes('gmail')
+  const formattedFrom = from.includes('<') ? from : `Destiny Support <${from}>`
+
   return {
-    from,
+    from: formattedFrom,
     transporter: nodemailer.createTransport({
-      host,
-      port,
-      secure: process.env.SMTP_SECURE === 'true',
+      ...(isGmail ? { service: 'gmail' } : { host, port }),
+      secure: process.env.SMTP_SECURE === 'true' || port === 465,
       ...(username && password ? { auth: { user: username, pass: password } } : {}),
-      connectionTimeout: 10_000,
-      greetingTimeout: 10_000,
-      socketTimeout: 20_000,
+      tls: {
+        rejectUnauthorized: false,
+      },
+      connectionTimeout: 15_000,
+      greetingTimeout: 15_000,
+      socketTimeout: 30_000,
     }),
   }
 }
@@ -105,8 +111,10 @@ export async function sendMailOrCreatePreview(mail: MailMessage): Promise<MailRe
       to: mail.to,
       subject: mail.subject,
       html: mail.html,
+      text: mail.text || mail.html.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim(),
     })
   } catch (error) {
+    console.error('[Destiny Mailer] SMTP sendMail failed:', error)
     let previewSaved = false
     try {
       await saveMailPreview(mail)

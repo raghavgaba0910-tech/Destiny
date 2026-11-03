@@ -83,9 +83,7 @@ export function AdminConsole({ applications, tickets }: { applications: Applicat
         return
       }
       if (decision === 'APPROVE') {
-        setMessage(body.emailDelivery === 'sent'
-          ? `Approved ${body.professionalCode}. ${body.emailMessage}`
-          : `Approved ${body.professionalCode}. Email status: ${body.emailMessage} Temporary password: ${body.temporaryPassword}`)
+        setMessage(`Approved ${body.professionalCode}. ${body.emailMessage} (Temporary password: ${body.temporaryPassword})`)
       } else {
         setMessage('Application rejected. The applicant may submit a new application.')
       }

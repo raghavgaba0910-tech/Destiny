@@ -118,21 +118,33 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
   }
 
   let emailDelivery: 'sent' | 'preview' | 'failed' = 'failed'
-  let emailMessage = 'The account was approved, but email could not be delivered or previewed. Share the temporary password securely.'
+  let emailMessage = 'The account was approved, but email could not be delivered. Share the temporary password securely.'
   try {
+    const targetEmail = application.email.trim().toLowerCase()
     const result = await sendProfessionalWelcome({
       id: created.id,
-      to: application.email,
+      to: targetEmail,
       name: application.name,
       professionalCode: created.professionalCode,
       temporaryPassword,
     })
     emailDelivery = result.delivery
-    emailMessage = result.message
-  } catch (error) {
+    emailMessage = result.delivery === 'sent'
+      ? `Welcome email with login credentials sent to ${targetEmail}.`
+      : result.message
+  } catch (error: unknown) {
     console.error('Professional welcome email could not be delivered:', error)
+    const errDetail =
+      error instanceof MailDeliveryError && error.cause instanceof Error
+        ? error.cause.message
+        : error instanceof Error
+          ? error.message
+          : 'Unknown mail error'
+
     if (error instanceof MailDeliveryError && error.previewSaved) {
-      emailMessage = 'Email delivery failed, but a local preview was saved. Share the temporary password securely.'
+      emailMessage = `Live email delivery failed (${errDetail}), but a local preview was saved. Share the temporary password securely.`
+    } else {
+      emailMessage = `Email delivery failed (${errDetail}). Share the temporary password securely.`
     }
   }
   return NextResponse.json({

@@ -116,7 +116,7 @@ export default auth((req) => {
   }
 
   // Professional Console (/pro): ONLY professionals allowed
-  if (pathname.startsWith('/pro')) {
+  if (pathname === '/pro' || pathname.startsWith('/pro/')) {
     if (role === 'PATIENT') {
       return NextResponse.redirect(new URL('/dashboard', nextUrl))
     }

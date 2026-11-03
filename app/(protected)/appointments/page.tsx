@@ -20,7 +20,7 @@ export default async function AppointmentsPage() {
       return <article key={appointment.id} className="flex flex-col gap-5 rounded-3xl border border-[#D3CCE2] bg-white p-6 shadow-xs sm:flex-row sm:items-center sm:justify-between"><div><span className={`rounded-full px-3 py-1 text-xs font-semibold ${appointment.status === 'COMPLETED' ? 'border border-[#C8BCE0] bg-[#EBE4F2] text-[#483D76]' : appointment.status === 'CANCELLED' ? 'border border-[#D3CCE2] bg-[#F5F3F8] text-[#766F8C]' : 'border border-[#C8BCE0] bg-[#EBE4F2] text-[#483D76]'}`}>{appointment.status.toLowerCase()}</span><h2 className="mt-3 text-lg font-bold text-[#221C35]">{otherName}</h2>{session.user.role !== 'PATIENT' && <p className="mt-1 text-xs text-[#554E6B]">{appointment.patientAge} years · {appointment.patientGender === 'MALE' ? 'Male' : appointment.patientGender === 'FEMALE' ? 'Female' : 'Other'}</p>}<p className="mt-1 text-sm text-[#554E6B]">{new Date(appointment.slot.startTime).toLocaleString('en-IN', { dateStyle: 'full', timeStyle: 'short', timeZone: 'Asia/Kolkata' })} IST</p></div>
         <div className="flex flex-wrap items-center gap-2.5">
           {canJoin ? (
-            <Link href={`/session/${appointment.id}`} className="rounded-xl bg-[#483D76] px-5 py-3 text-center text-sm font-semibold text-[#F5F3F8] transition hover:bg-[#372E5A]">
+            <Link href={`/sessions/${appointment.id}`} className="rounded-xl bg-[#483D76] px-5 py-3 text-center text-sm font-semibold text-[#F5F3F8] transition hover:bg-[#372E5A]">
               Join session
             </Link>
           ) : appointment.status === 'COMPLETED' ? (

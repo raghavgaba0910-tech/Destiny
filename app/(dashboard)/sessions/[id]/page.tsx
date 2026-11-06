@@ -6,7 +6,6 @@ import { useRouter, useParams } from 'next/navigation'
 import {
   LiveKitRoom,
   VideoConference,
-  RoomAudioRenderer,
 } from '@livekit/components-react'
 import {
   AlertCircle,
@@ -29,15 +28,32 @@ export default function SessionPage({ params }: PageProps) {
   const router = useRouter()
   const routeParams = useParams()
 
-  // Support both Promise params (Next.js 15) and useParams hook
-  const resolvedParams = params ? use(params) : null
-  const appointmentId =
-    resolvedParams?.id ??
-    (typeof routeParams?.id === 'string'
-      ? routeParams.id
-      : Array.isArray(routeParams?.id)
-        ? routeParams.id[0]
-        : '')
+  // Safely extract appointmentId from useParams or params Promise
+  const [appointmentId, setAppointmentId] = useState<string>(() => {
+    if (typeof routeParams?.id === 'string' && routeParams.id) {
+      return routeParams.id
+    }
+    if (Array.isArray(routeParams?.id) && routeParams.id[0]) {
+      return routeParams.id[0]
+    }
+    return ''
+  })
+
+  useEffect(() => {
+    if (!appointmentId) {
+      if (typeof routeParams?.id === 'string' && routeParams.id) {
+        setAppointmentId(routeParams.id)
+      } else if (Array.isArray(routeParams?.id) && routeParams.id[0]) {
+        setAppointmentId(routeParams.id[0])
+      } else if (params) {
+        params
+          .then((p) => {
+            if (p?.id) setAppointmentId(p.id)
+          })
+          .catch(() => {})
+      }
+    }
+  }, [routeParams, params, appointmentId])
 
   const [mounted, setMounted] = useState(false)
   const [token, setToken] = useState<string | null>(null)
@@ -46,13 +62,11 @@ export default function SessionPage({ params }: PageProps) {
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
   const [permissionWarning, setPermissionWarning] = useState<string | null>(null)
 
-  // 1. Lifecycle & Token Fetch
+  // 1. Fetch Session Token
   useEffect(() => {
     setMounted(true)
 
     if (!appointmentId) {
-      setStatus('error')
-      setErrorMessage('Invalid session link: appointment ID is missing.')
       return
     }
 
@@ -244,6 +258,7 @@ export default function SessionPage({ params }: PageProps) {
   }
 
   // 6. Connected State: LiveKit Video Room
+  // Note: VideoConference internally renders RoomAudioRenderer, so extra RoomAudioRenderer is omitted to prevent duplicate audio tracks.
   return (
     <div
       className="relative h-screen w-full bg-slate-950 overflow-hidden"
@@ -285,7 +300,6 @@ export default function SessionPage({ params }: PageProps) {
         className="h-full w-full"
       >
         <VideoConference />
-        <RoomAudioRenderer />
       </LiveKitRoom>
     </div>
   )

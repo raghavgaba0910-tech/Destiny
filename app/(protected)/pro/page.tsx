@@ -28,7 +28,7 @@ export default async function ProfessionalConsolePage() {
       where: {
         professionalId: professional.id,
         status: 'UPCOMING',
-        slot: { startTime: { gte: new Date() } },
+        slot: { startTime: { gte: new Date(Date.now() - 2 * 60 * 60 * 1000) } },
       },
       include: { slot: true, sharedAssessment: true },
       orderBy: { slot: { startTime: 'asc' } },
@@ -72,7 +72,7 @@ export default async function ProfessionalConsolePage() {
                     <h3 className="font-semibold text-[#221C35]">{appointment.patientName}</h3>
                     <p className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-[#554E6B]"><span>{appointment.patientAge} years</span><span>{appointment.patientGender === 'OTHER' ? 'Other' : appointment.patientGender === 'MALE' ? 'Male' : 'Female'}</span><span className="inline-flex items-center gap-1"><Clock3 className="h-3.5 w-3.5 text-[#BD6999]" />{new Date(appointment.slot.startTime).toLocaleString('en-IN', { dateStyle: 'full', timeStyle: 'short', timeZone: 'Asia/Kolkata' })} IST</span></p>
                   </div>
-                  <Link href={`/session/${appointment.id}`} className="rounded-xl bg-[#483D76] px-4 py-2.5 text-center text-sm font-semibold text-[#F5F3F8] transition hover:bg-[#372E5A]">Open session</Link>
+                  <Link href={`/sessions/${appointment.id}`} className="rounded-xl bg-[#483D76] px-4 py-2.5 text-center text-sm font-semibold text-[#F5F3F8] transition hover:bg-[#372E5A]">Open session</Link>
                 </div>
                 {sharedAssessment ? (
                   <details className="mt-4 rounded-xl border border-[#D3CCE2] bg-white p-4">

@@ -1,16 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { cookies } from 'next/headers'
-import { createServerClient } from '@supabase/ssr'
 import { AccessToken } from 'livekit-server-sdk'
 import { auth } from '@/auth'
 import { db } from '@/lib/db'
-
-interface AppointmentRecord {
-  id: string
-  therapist_id: string
-  patient_id: string
-  status: 'scheduled' | 'in_progress' | 'completed' | 'cancelled'
-}
 
 interface TokenRequestBody {
   appointmentId?: string
@@ -18,62 +9,20 @@ interface TokenRequestBody {
 
 export async function POST(req: NextRequest): Promise<NextResponse> {
   try {
-    // 1. Framework & Auth: Check Supabase session if configured, with NextAuth fallback
-    let activeUser: { id: string; email?: string | null } | null = null
-    let supabase: ReturnType<typeof createServerClient> | null = null
-
-    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
-    const supabaseAnonKey =
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ||
-      process.env.SUPABASE_ANON_KEY
-
-    if (supabaseUrl && supabaseAnonKey) {
-      try {
-        const cookieStore = await cookies()
-        supabase = createServerClient(supabaseUrl, supabaseAnonKey, {
-          cookies: {
-            getAll() {
-              return cookieStore.getAll()
-            },
-            setAll(cookiesToSet) {
-              try {
-                cookiesToSet.forEach(({ name, value, options }) =>
-                  cookieStore.set(name, value, options)
-                )
-              } catch {
-                // Handled safely if called in an environment restricting cookie sets
-              }
-            },
-          },
-        })
-
-        const {
-          data: { user: supabaseUser },
-        } = await supabase.auth.getUser()
-
-        if (supabaseUser) {
-          activeUser = { id: supabaseUser.id, email: supabaseUser.email }
-        }
-      } catch (err) {
-        console.warn('[Supabase Auth skipped/failed]:', err)
-      }
+    // 1. Authenticate user via NextAuth
+    const nextAuthSession = await auth()
+    if (!nextAuthSession?.user?.id) {
+      return NextResponse.json({ error: 'Unauthorized: Sign-in required' }, { status: 401 })
     }
 
-    if (!activeUser) {
-      const nextAuthSession = await auth()
-      if (nextAuthSession?.user?.id) {
-        activeUser = {
-          id: nextAuthSession.user.id,
-          email: nextAuthSession.user.email,
-        }
-      }
+    const activeUser = {
+      id: nextAuthSession.user.id,
+      email: nextAuthSession.user.email,
+      name: nextAuthSession.user.name,
+      role: nextAuthSession.user.role,
     }
 
-    if (!activeUser) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-    }
-
-    // 2. Input & DB Verification
+    // 2. Validate input
     let body: TokenRequestBody
     try {
       body = (await req.json()) as TokenRequestBody
@@ -98,96 +47,63 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
 
     const trimmedAppointmentId = appointmentId.trim()
 
-    // Query appointments table via Supabase (if configured), with fallback to Prisma for website bookings
-    let isParticipant = false
-    let isEnded = false
-    let appointmentFound = false
+    // 3. Query appointment from Prisma database
+    const appointment = await db.appointment.findUnique({
+      where: { id: trimmedAppointmentId },
+      include: {
+        professional: { include: { user: true } },
+        patient: true,
+        slot: true,
+      },
+    })
 
-    if (supabase) {
-      try {
-        const { data, error: dbError } = await (
-          supabase
-            .from('appointments')
-            .select('id, therapist_id, patient_id, status')
-            .eq('id', trimmedAppointmentId)
-            .single() as Promise<{ data: AppointmentRecord | null; error: unknown }>
-        )
-        const appointment = data
-
-        if (appointment && !dbError) {
-          appointmentFound = true
-          isParticipant =
-            activeUser.id === appointment.therapist_id ||
-            activeUser.id === appointment.patient_id
-          isEnded =
-            appointment.status === 'completed' ||
-            appointment.status === 'cancelled'
-        }
-      } catch {
-        // Supabase query failed or table not populated, check Prisma
-      }
+    if (!appointment) {
+      return NextResponse.json(
+        { error: 'Appointment not found' },
+        { status: 404 }
+      )
     }
 
-    if (!appointmentFound) {
-      const prismaAppointment = await db.appointment.findUnique({
-        where: { id: trimmedAppointmentId },
-        include: { professional: { include: { user: true } }, patient: true },
-      })
+    // 4. Verify participant permissions (patient, assigned professional, or admin)
+    const isPatient =
+      activeUser.id === appointment.patientId ||
+      (!!activeUser.email &&
+        activeUser.email.toLowerCase() === appointment.patient.email.toLowerCase())
 
-      if (!prismaAppointment) {
-        return NextResponse.json(
-          { error: 'Appointment not found' },
-          { status: 404 }
-        )
-      }
+    const isProfessional =
+      activeUser.id === appointment.professional.userId ||
+      (!!activeUser.email &&
+        activeUser.email.toLowerCase() ===
+          appointment.professional.user.email.toLowerCase())
 
-      appointmentFound = true
-      isParticipant =
-        activeUser.id === prismaAppointment.patientId ||
-        activeUser.id === prismaAppointment.professional.userId ||
-        (!!activeUser.email && activeUser.email.toLowerCase() === prismaAppointment.patient.email.toLowerCase()) ||
-        (!!activeUser.email && activeUser.email.toLowerCase() === prismaAppointment.professional.user.email.toLowerCase())
+    const isAdmin = activeUser.role === 'ADMIN'
 
-      isEnded =
-        prismaAppointment.status === 'COMPLETED' ||
-        prismaAppointment.status === 'CANCELLED'
-    }
-
-    // Verify user is a participating therapist or patient
-    if (!isParticipant) {
+    if (!isPatient && !isProfessional && !isAdmin) {
       return NextResponse.json(
         { error: 'Forbidden: You are not a participant in this consultation' },
         { status: 403 }
       )
     }
 
-    // Ensure appointment is active
-    if (isEnded) {
+    // 5. Ensure consultation status is active
+    if (
+      appointment.status === 'COMPLETED' ||
+      appointment.status === 'CANCELLED'
+    ) {
       return NextResponse.json(
         { error: 'This consultation has already ended' },
         { status: 400 }
       )
     }
 
-    // 3. LiveKit AccessToken Generation
-    let apiKey = process.env.LIVEKIT_API_KEY
-    if (!apiKey || apiKey.includes('your_livekit')) {
-      apiKey = 'APIKagamHKrErvH'
-    }
-
-    let apiSecret = process.env.LIVEKIT_API_SECRET
-    if (!apiSecret || apiSecret.includes('your_livekit')) {
-      apiSecret = 'aK0tYmXHFwiKpS2BX0Ka9fiu4VfebJK8mLlhDIhe30zD'
-    }
-
-    let wsUrl = process.env.LIVEKIT_URL || process.env.NEXT_PUBLIC_LIVEKIT_URL
-    if (!wsUrl || wsUrl.includes('your-project')) {
-      wsUrl = 'wss://destiny-video-sessions-som6m6u1.livekit.cloud'
-    }
+    // 6. LiveKit Configuration
+    const apiKey = process.env.LIVEKIT_API_KEY
+    const apiSecret = process.env.LIVEKIT_API_SECRET
+    const wsUrl = process.env.NEXT_PUBLIC_LIVEKIT_URL || process.env.LIVEKIT_URL
 
     if (!apiKey || !apiSecret || !wsUrl) {
       console.error(
-        '[LiveKit Token Error] Missing LIVEKIT_API_KEY, LIVEKIT_API_SECRET, or NEXT_PUBLIC_LIVEKIT_URL in process.env'
+        '[LiveKit Token Error] Missing LIVEKIT_API_KEY, LIVEKIT_API_SECRET, or NEXT_PUBLIC_LIVEKIT_URL in environment variables.'
       )
       return NextResponse.json(
         { error: 'LiveKit server configuration is incomplete' },
@@ -195,10 +111,17 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
       )
     }
 
+    const displayName =
+      activeUser.name ||
+      activeUser.email ||
+      (isProfessional ? 'Healthcare Provider' : 'Client')
+
+    // 7. Mint LiveKit AccessToken
+    // ttl is set to 4 hours so full consultations (15-20 min or extended) run smoothly without token expiration
     const at = new AccessToken(apiKey, apiSecret, {
       identity: activeUser.id,
-      name: activeUser.email ?? 'Participant',
-      ttl: '1h',
+      name: displayName,
+      ttl: '4h',
     })
 
     at.addGrant({
